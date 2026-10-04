@@ -14,7 +14,7 @@
 * **Rivalry Record:** Your lifetime win-loss record against each opponent is tracked and shown as a badge on their card (FIRST MEETING, gold when you're leading, red when trailing) and as a W-L card on every game summary.
 * ** Learning Library:** Every question you miss is saved as a KJV verse flashcard. Review them from the summary screen -- tap to flip, mark MASTERED to remove, and resize the verse text with the -/+ buttons.
 * **The Ticket Store:** Spend your lifetime Total Treasury on five themed question packs -- each unlocking hundreds of additional KJV questions and a matching category-only way to play. See below for details.
-* **Procedural Web Audio API Sound Effects:** Sound effects and train ambient audio generated programmatically via JavaScript -- no audio assets required for gameplay. The title-screen weather music streams from an external `weather.mp3` file.
+* **Procedural Web Audio API Sound Effects:** Sound effects and train ambient audio generated programmatically via JavaScript -- no audio assets required for gameplay. The title-screen weather music is embedded in the page.
 * **The Jerusalem Herald News Ticker:** A two-line LED marquee on the title screen delivers scrolling local weather and a rotating feed of KJV-inspired "breaking news" headlines -- see below for details.
 * **Responsive & Immersive UI:** Features a custom neon train CSS layout, animated fog background, mobile-optimized scripture viewing drawers, and dynamic game statistics tracking.
 
@@ -206,8 +206,8 @@ The project is organized into a handful of files rather than a single monolithic
 * `questions.json` -- The KJV question bank (100 free questions plus 901 across the five Ticket Store packs -- 1,001 total), including scripture references, quotes, and answer choices.
 * `store.html` -- The standalone Ticket Store page described above, sharing the game's branding, fog background, and visual style.
 * `logo.png` -- The game's logo image.
-* `weather.mp3` -- Background music for the Jerusalem Herald weather segment on the title screen.
-* `License.pdf` -- Project license documentation.
+* `LICENSE` -- Project license terms (plain text).
+* `license.html` -- The same license terms as a styled web page.
 
 ---
 
