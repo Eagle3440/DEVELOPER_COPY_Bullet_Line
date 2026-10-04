@@ -2227,6 +2227,16 @@
       if (b) { clearTimeout(b._hideT); b.classList.add('hidden'); }
     }
 
+    // On a loss, clear every race banner at once so none can linger into the
+    // defeat video. On a win they stay — the "added to the race bank" message
+    // is true there, since the bank is kept.
+    function clearRaceBanners() {
+      ['ticket-flash', 'stall-flash', 'advance-flash', 'hazard-banner'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) { clearTimeout(el._hideT); el.classList.add('hidden'); }
+      });
+    }
+
     function resolveHazardBanner(dodged) {
       let b = document.getElementById('hazard-banner');
       if (!b) {
@@ -2312,6 +2322,7 @@
 
     function playEndSequence(isWin) {
       clearEndSeqTimers();
+      if (!isWin) clearRaceBanners();
       const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       const stepDelay = reduceMotion ? 0 : 350;
       for (let s = 7; s >= 0; s--) {
