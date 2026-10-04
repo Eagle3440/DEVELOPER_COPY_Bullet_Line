@@ -4,7 +4,7 @@
 
 ---
 
-## Core Features
+## 🚀 Core Features
 
 * **KJV Scripture Integration:** Every trivia question is paired with a direct King James Bible reference and scripture quote to deepen your study and understanding of the Word.
 * **The Shekel Builder Round:** A fast-paced 60-second opening round where consecutive correct answers pay a rising combo ladder -- 1,000 -> 1,250 -> 1,500 -> 1,750 -> 2,000 Shekels of Silver. Five in a row banks 1 AUTO STALL + 1 AUTO ADVANCE and restarts the ladder; a miss resets it to 1,000.
@@ -20,7 +20,7 @@
 
 ---
 
-## How to Play
+## 🎮 How to Play
 
 1. **Start the Game:** Click the **START GAME** button on the main screen, then **choose your opponent** -- Scribe, Scholar, or Prophet. Tapping a card starts the race.
 2. **The Builder Round:** Answer as many KJV Bible questions as you can within 60 seconds to stack up your starting Shekels of Silver. Streaks pay extra: 5 correct in a row banks 1 AUTO STALL and 1 AUTO ADVANCE together (max 1 each), and the streak resets.
@@ -38,7 +38,7 @@ If you've bought one or more question packs from the Ticket Store (see below), t
 
 ---
 
-## Treasury Management System
+## 💰 Treasury Management System
 
 The game tracks your biblical wealth across three distinct metrics:
 
@@ -57,7 +57,7 @@ The game tracks your biblical wealth across three distinct metrics:
 * **Display:** Shows at the top-right of the screen during gameplay.
 * **Purpose:** Tracks your all-time success across every game you've ever played on this device/browser, and doubles as your spending balance in the Ticket Store.
 
-### ** HIGH SCORE TREASURY** (Persistent Record)
+### **🏆 HIGH SCORE TREASURY** (Persistent Record)
 * **What it is:** The single highest TREASURY amount you've ever earned in a game.
 * **When it updates:** Automatically updates whenever you complete a game with more Shekels than your previous high score.
 * **When it resets:** Never resets automatically--persists forever until you beat it. You can manually clear it only by clearing your browser's localStorage.
@@ -79,7 +79,7 @@ Game 1 (Win with 3,000):
 Game 2 (Win with 6,000):
   - TREASURY: 6,000 Shekels  game ends, resets to 0
   - TOTAL TREASURY: 21,000 Shekels (15,000 + 6,000)
-  - HIGH SCORE: 6,000 Shekels  (NEW HIGH SCORE!)
+  - HIGH SCORE: 6,000 Shekels 🎉 (NEW HIGH SCORE!)
 
 Game 3 (Lose, earn 0):
   - TREASURY: 0 Shekels (crashed before banking)
@@ -92,7 +92,7 @@ Page reload/new browser session:
 
 ---
 
-## The Ticket Store
+## 🎟️ The Ticket Store
 
 `store.html` is a standalone page, styled to match the main game, where you spend your **TOTAL TREASURY** on five themed "Bullet Train Ticket" question packs. It shares the `totalTreasuryAccount` localStorage balance directly with the game -- so Shekels you've banked from winning games are exactly what you spend here, and the balance updates live in both places.
 
@@ -113,13 +113,13 @@ Page reload/new browser session:
 
 ---
 
-## Game Summary Report
+## 📊 Game Summary Report
 
 After each game concludes (win or loss), a detailed **Game Summary Report** is displayed showing:
 
 * **Question-by-Question Breakdown:** Every question you answered during the game, listed in order with:
  * Your choice vs. the correct answer
- * Result badge ( CORRECT or INCORRECT)
+ * Result badge (✓ CORRECT or ✗ INCORRECT)
  * The KJV scripture reference paired with each question
  * The full scripture text for deeper study
 * **High Score Banner:**
@@ -130,7 +130,7 @@ After each game concludes (win or loss), a detailed **Game Summary Report** is d
 * **Ticket Bonus Breakdown:** On a win where a Mystery Ticket Bonus fired, a gold " TICKET BONUS: +X Shekels" line shows exactly how much of your total came from your mystery ticket reward.
 * **Opponent Bounty:** On a win against Scholar or Prophet, a line names the opponent you beat and the win bonus applied (x1.25 / x1.5).
 * **Game Statistics:** A running total at the bottom tracks total games played, games won, and games lost for the current browser session (these counters are in-memory only and reset on page reload -- unlike TOTAL TREASURY and HIGH SCORE, they are not saved to localStorage).
-* **Print Report:** Click the ** Print** button next to the report title to open a print-friendly popup window with all questions, answers, scripture references, and formatting -- perfect for saving as a PDF or printing a physical copy for personal record-keeping.
+* **Print Report:** Click the **🖨️ Print** button next to the report title to open a print-friendly popup window with all questions, answers, scripture references, and formatting -- perfect for saving as a PDF or printing a physical copy for personal record-keeping.
 * **Restart:** Start a fresh game immediately from the summary screen.
 
 Separately, a **SHARE** link in the top navigation (available any time, not just after a game) opens a Facebook share dialog for the game's own URL -- it shares the game itself, not your individual results.
@@ -139,7 +139,7 @@ This report helps reinforce biblical knowledge, track your progress over multipl
 
 ---
 
-## Learning Library
+## 📚 Learning Library
 
 Every question you miss -- in the Shekel Builder, the race, or sudden death -- is saved as a KJV verse flashcard in your **Learning Library** (stored in localStorage as `bulletline_learning_library`, one card per verse, deduplicated by reference). The cards say nothing about the game, your wrong answer, or the right one -- just the verse.
 
@@ -151,7 +151,7 @@ Every question you miss -- in the Shekel Builder, the race, or sudden death -- i
 
 ---
 
-## Hazard Events
+## ⚠️ Hazard Events
 
 The race isn't just you versus Train X -- the track itself fights back. A 14-card hazard deck (Bridge Out, the Red Sea, Jonah's Storm, Jericho Walls, Daniel's Lions, the Fiery Furnace, Elijah's Whirlwind, Locust Swarm, Earth Quakes, Jordan Overflows, Hornets, Frogs, Thunder on Mount Sinai, Earth Opens) is shuffled once per session with no repeats until every card has been seen.
 
@@ -162,7 +162,7 @@ The race isn't just you versus Train X -- the track itself fights back. A 14-car
 
 ---
 
-## Question Deck Shuffle Logic
+## 🔄 Question Deck Shuffle Logic
 
 The game uses a **smart deck shuffling system** to ensure a fresh experience while preventing question fatigue:
 
@@ -174,7 +174,7 @@ The game uses a **smart deck shuffling system** to ensure a fresh experience whi
 
 ---
 
-## The Jerusalem Herald News Ticker
+## 📰 The Jerusalem Herald News Ticker
 
 The title screen features a two-line scrolling LED ticker themed as a fictional news network, "The Jerusalem Herald":
 
@@ -191,13 +191,13 @@ The title screen features a two-line scrolling LED ticker themed as a fictional 
 
 ---
 
-## Feedback
+## 💬 Feedback
 
 A **FEEDBACK** link in the top navigation opens an in-page form for sending questions, comments, or suggestions about the game directly to the developer's email.
 
 ---
 
-## Project Structure
+## 📂 Project Structure
 
 The project is organized into a handful of files rather than a single monolithic one, separating the question data and styling from the application logic:
 
@@ -211,7 +211,7 @@ The project is organized into a handful of files rather than a single monolithic
 
 ---
 
-## License
+## 📜 License
 
 (c) 2026 William Monti. All rights reserved.
 
