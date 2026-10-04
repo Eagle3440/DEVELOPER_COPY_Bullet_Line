@@ -10,9 +10,9 @@
 * **The Shekel Builder Round:** A fast-paced 60-second opening round where consecutive correct answers pay a rising combo ladder -- 1,000 -> 1,250 -> 1,500 -> 1,750 -> 2,000 Shekels of Silver. Five in a row banks 1 AUTO STALL + 1 AUTO ADVANCE and restarts the ladder; a miss resets it to 1,000.
 * **Choose Your Opponent:** After START GAME, pick your rival's smarts -- **Scribe** (68% accuracy, x1 win bonus), **Scholar** (76% accuracy, x1.25 win bonus), or **Prophet** (84% accuracy, x1.5 win bonus). Sharper mind, richer win. Your choice is remembered between visits.
 * **Head-to-Head Race Mechanics:** A 7-step sprint against the rival Train X -- you board at Step 5, 6, or 7 depending on the line you choose, and the first to reach the station (Step 0) wins. Correct answers advance your Bullet Line; Train X advances on its own hidden accuracy roll each round.
-* ** Hazard Events:** Up to one Bible-themed track hazard per race (round 4 or later, never in sudden death) -- Bridge Out, the Red Sea, Daniel's Lions, the Fiery Furnace, and 10 more, drawn from a shuffled no-repeat deck. The race question doubles as your dodge test: answer correctly to dodge it, miss and you're knocked back a step.
+* **Hazard Events:** Up to one Bible-themed track hazard per race (round 4 or later, never in sudden death) -- Bridge Out, the Red Sea, Daniel's Lions, the Fiery Furnace, and 10 more, drawn from a shuffled no-repeat deck. The race question doubles as your dodge test: answer correctly to dodge it, miss and you're knocked back a step.
 * **Rivalry Record:** Your lifetime win-loss record against each opponent is tracked and shown as a badge on their card (FIRST MEETING, gold when you're leading, red when trailing) and as a W-L card on every game summary.
-* ** Learning Library:** Every question you miss is saved as a KJV verse flashcard. Review them from the summary screen -- tap to flip, mark MASTERED to remove, and resize the verse text with the -/+ buttons.
+* **Learning Library:** Every question you miss is saved as a KJV verse flashcard. Review them from the summary screen -- tap to flip, mark MASTERED to remove, and resize the verse text with the -/+ buttons.
 * **The Ticket Store:** Spend your lifetime Total Treasury on five themed question packs -- each unlocking hundreds of additional KJV questions and a matching category-only way to play. See below for details.
 * **Procedural Web Audio API Sound Effects:** Sound effects and train ambient audio generated programmatically via JavaScript -- no audio assets required for gameplay. The title-screen weather music is embedded in the page.
 * **The Jerusalem Herald News Ticker:** A two-line LED marquee on the title screen delivers scrolling local weather and a rotating feed of KJV-inspired "breaking news" headlines -- see below for details.
@@ -145,7 +145,7 @@ Every question you miss -- in the Shekel Builder, the race, or sudden death -- i
 
 * **Opening it:** After a game where you missed questions, the summary shows a **LEARNING LIBRARY** button ("N new verses waiting for you ->") with a gold NEW badge while you have unreviewed verses.
 * **Flip cards:** The front shows the scripture reference with a KJV badge; tap to flip to the verse text on the back.
-* ** MASTERED** removes the card from your library; **NEXT ->** keeps it and moves on. A counter shows your place (N of M).
+* **MASTERED** removes the card from your library; **NEXT ->** keeps it and moves on. A counter shows your place (N of M).
 * **Text size:** **-** and **+** buttons above the card resize the verse text (0.8-2.5rem) -- your size is remembered and applies to every card.
 * **Honor system:** There is no quiz or test mode -- review is on your conscience.
 
