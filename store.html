@@ -139,8 +139,8 @@
       </div>
     </header>
 
-    <!-- Dev-only test controls: remove once wired to the real game -->
-    <div class="mx-auto max-w-[1280px] px-4 pt-4 md:px-6">
+    <!-- Dev-only test controls: hidden by default (see devTestBar reveal) -->
+    <div id="devTestBar" style="display:none" class="mx-auto max-w-[1280px] px-4 pt-4 md:px-6">
       <div class="flex flex-wrap items-center gap-2 rounded-[10px] border border-dashed border-[#1f314d] bg-[#0a1424]/60 px-3 py-2 text-[10px] tracking-[0.1em] text-[#5a7192]">
         <span class="font-bold text-[#6d86a8]">TEST CONTROLS (remove when wired to the real game):</span>
         <button id="debugAdd50k" class="rounded-full border border-[#1f314d] bg-[#132238] px-3 py-1 font-bold text-[#8aa0bf] hover:text-white">+50,000</button>
@@ -909,6 +909,28 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("debugAdd500k").onclick = () => debugAddShekels(500000);
   render();
 });
+
+// --- Secret dev-test reveal -----------------------------------------------
+// Type "shekels" anywhere on the page (outside inputs) to toggle the hidden
+// dev test bar. Type it again to hide it; Escape hides it too.
+// There is no on-screen hint that this exists.
+(function initDevTestReveal() {
+  const WORD = "shekels";
+  let buf = "";
+  const bar = document.getElementById("devTestBar");
+  if (!bar) return;
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") { bar.style.display = "none"; buf = ""; return; }
+    const tag = ((e.target && e.target.tagName) || "").toLowerCase();
+    if (tag === "input" || tag === "textarea" || (e.target && e.target.isContentEditable)) return;
+    if (e.key.length !== 1) return;
+    buf = (buf + e.key.toLowerCase()).slice(-WORD.length);
+    if (buf === WORD) {
+      buf = "";
+      bar.style.display = (bar.style.display === "none") ? "" : "none";
+    }
+  });
+})();
 
 // --- Fog canvas particle system --------------------------------------------
 // Copied verbatim from the game's index.html so the store's background
