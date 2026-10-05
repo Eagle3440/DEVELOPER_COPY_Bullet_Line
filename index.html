@@ -2631,7 +2631,16 @@
         return;
       }
 
-      showVersePanel(activeQuestion);
+      // Phone only (2026-10-05): let the right/wrong answer feedback breathe
+      // for 2s before the verse panel slides up. Desktop keeps instant timing.
+      if (window.matchMedia('(max-width: 767px)').matches) {
+        const answeredQ = activeQuestion;
+        setTimeout(() => {
+          if (raceActive && activeQuestion === answeredQ) showVersePanel(answeredQ);
+        }, 2000);
+      } else {
+        showVersePanel(activeQuestion);
+      }
     }
 
     function startTiebreak() {
