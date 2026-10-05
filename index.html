@@ -31,7 +31,7 @@
   <meta property="og:url" content="https://eagle3440.github.io/scripture-pursuit/" />
   <meta property="og:type" content="website" />
 
-  <link rel="stylesheet" href="styles.css?v=13">
+  <link rel="stylesheet" href="styles.css?v=14">
   <script src="https://cdn.jsdelivr.net/npm/gameanalytics@4.0.0/umd/gameanalytics.min.js"></script>
 </head>
 <body>
@@ -1829,7 +1829,7 @@
       offersWrap.innerHTML =
         `<div class="opponent-header">
            <div style="font-size:0.7rem; font-weight:800; letter-spacing:3px; color:#d4af37;">THE RIVAL AWAITS</div>
-           <div style="font-size:1.4rem; font-weight:900; letter-spacing:1px; color:#eef2f7; margin:4px 0;">CHOOSE YOUR OPPONENT <span style="font-size:0.65rem;color:#5a6b85;">v3</span></div>
+           <div style="font-size:1.4rem; font-weight:900; letter-spacing:1px; color:#eef2f7; margin:4px 0;">CHOOSE YOUR OPPONENT</div>
            <div style="font-size:0.8rem; color:#8fa0b8;">Each one drives Train X. The sharper the mind, the richer the win &mdash; tap a card to race.</div>
          </div>` +
         OPPONENTS.map(o => `
@@ -1866,6 +1866,7 @@
       summaryWrap.classList.add('hidden');
       summaryScoreBanner.classList.add('hidden');
       document.getElementById('library-wrap').classList.add('hidden');
+      document.getElementById('library-font-wrap').classList.add('hidden');
       diffIndicator.classList.add('hidden');
       hideVersePanel();
       document.getElementById('ticker-spacer').classList.add('hidden');
@@ -3010,6 +3011,7 @@
       summaryWrap.classList.add('hidden');
       summaryScoreBanner.classList.add('hidden');
       document.getElementById('library-wrap').classList.add('hidden');
+      document.getElementById('library-font-wrap').classList.add('hidden');
       diffIndicator.classList.add('hidden');
       hideVersePanel();
       stickyBottomBar.classList.add('hidden');

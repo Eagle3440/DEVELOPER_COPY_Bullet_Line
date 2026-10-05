@@ -2279,3 +2279,37 @@
   color: #8da4c4;
   line-height: 1.6;
 }
+
+/* ============================================================
+   PHONE LAYOUT FIXES — 2026-10-05
+   Everything in this block is scoped to max-width: 767px.
+   Desktop (>767px) is completely untouched.
+   ============================================================ */
+@media (max-width: 767px) {
+
+  /* --- Departures board: stop TIME/TRK/STATUS columns colliding --- */
+  .ticker-board { padding: 12px; }
+  .ticker-title { font-size: 13px; letter-spacing: 1px; }
+  .ticker-clock { font-size: 12px; }
+  .ticker-column-headers { font-size: 8px; letter-spacing: 0; }
+  .ticker-caption { font-size: 9px; }
+  .ticker-cell { height: 15px; }
+  .ticker-cell span { font-size: 9px; }
+
+  /* --- Welcome LED ticker: keep the full line on-screen --- */
+  .led-ticker-msg { font-size: 0.8rem; letter-spacing: 1.5px; }
+
+  /* --- Sound toggle: sit beside START GAME instead of off-screen --- */
+  .start-row { display: flex; gap: 10px; width: 100%; max-width: 360px; }
+  .start-row #start-game-btn { flex: 1 1 auto; width: auto; min-width: 0; }
+  .start-row .sound-toggle-btn { position: static; margin: 0; flex: 0 0 44px; }
+
+  /* --- Status bar: no awkward wrap of the totals --- */
+  .status-bar:not(.chase-mode):not(.building) { font-size: 0.68rem; }
+
+  /* --- Opponent cards: cap width so they stop scrolling forever --- */
+  .opp-card { max-width: 320px; margin-left: auto; margin-right: auto; }
+
+  /* --- Race tokens: smaller labels so names stop truncating --- */
+  .chaser-text-badge, .player-token { font-size: 0.6rem; letter-spacing: 0; }
+}
