@@ -1666,7 +1666,9 @@
       ledTickerLine1.resume();
       ledTickerLine2.resume();
       const weatherMusic = document.getElementById('weather-music-audio');
-      if (weatherMusic && weatherMusic.currentTime > 0 && !weatherMusic.ended) weatherMusic.play().catch(() => {});
+      // Respect the mute toggle: never restart the music while muted (the
+      // button shows red/muted, so a restart here looked like mute failing).
+      if (!soundMuted && weatherMusic && weatherMusic.currentTime > 0 && !weatherMusic.ended) weatherMusic.play().catch(() => {});
     });
 
     function startWelcomeLedTicker() {
