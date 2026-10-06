@@ -2321,4 +2321,36 @@
     -webkit-backdrop-filter: none;
     background: rgba(4, 10, 20, 0.98);
   }
+
+  /* --- Title-screen treasury ledger (2026-10-05): stack TREASURY /
+         TOTAL TREASURY / HIGH SCORE as ledger rows — labels left, values
+         sharing one right edge. Title only (:not(.boxed)); builder/race
+         and desktop untouched. --- */
+  #logo-header-box .status-bar:not(.boxed) {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: stretch;
+  }
+  /* NOTE: the middle wrapper carries an inline display:flex (needed for the
+     builder/race timer row), so it can't be flattened from the stylesheet.
+     The width:100% on #high-score-display below achieves the ledger row. */
+  #logo-header-box .status-bar:not(.boxed) > div:first-child,
+  #logo-header-box .status-bar:not(.boxed) #high-score-display,
+  #logo-header-box .status-bar:not(.boxed) #total-treasury-display {
+    position: static;
+    left: auto;
+    top: auto;
+    transform: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    text-align: left;
+    width: 100%;
+  }
+  /* The empty combo span would otherwise steal the end slot in the
+     space-between row and park the Treasury value mid-row. */
+  #logo-header-box .status-bar:not(.boxed) #combo-val:empty {
+    display: none;
+  }
 }
