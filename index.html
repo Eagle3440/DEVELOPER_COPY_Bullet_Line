@@ -375,7 +375,20 @@
 
     let audioCtx = null;
     let soundEnabled = false;
-    let soundMuted = false;
+    // The sound toggle starts OFF (muted look): the page loads silent, and the
+    // button always shows the true state. Tapping it — or the touch-anywhere
+    // unlock below — turns sound on.
+    let soundMuted = true;
+
+    // One place that paints the toggle button + ticker mute from soundMuted.
+    // Only called after full script evaluation (gestures, taps, modal), so the
+    // button const below is always initialized by call time.
+    function syncSoundToggleUI() {
+      soundToggleBtn.classList.toggle('muted', soundMuted);
+      soundToggleBtn.setAttribute('aria-label', soundMuted ? 'Unmute train sounds' : 'Mute train sounds');
+      soundToggleBtn.title = soundMuted ? 'Unmute train sounds' : 'Mute train sounds';
+      if (window.setBulletlineTickerSoundMuted) window.setBulletlineTickerSoundMuted(soundMuted);
+    }
     // Tracks whether the welcome LED ticker (weather + news on line 2) is running,
     // so the audio-unlock handler can restart line 2 at the weather step and start
     // its music right when the weather segment starts.
@@ -462,8 +475,7 @@
     function openFeedbackModal() {
       soundMutedBeforeFeedback = soundMuted;
       soundMuted = true;
-      if (soundToggleBtn) soundToggleBtn.classList.add('muted');
-      if (window.setBulletlineTickerSoundMuted) window.setBulletlineTickerSoundMuted(true);
+      syncSoundToggleUI();
       // The weather-music and news-intro clips are plain <audio> elements:
       // soundMuted only guards *starting* sounds, so pause them outright.
       const weatherMusic = document.getElementById('weather-music-audio');
@@ -477,8 +489,7 @@
     function closeFeedbackModal() {
       document.getElementById('feedback-modal').classList.add('hidden');
       soundMuted = soundMutedBeforeFeedback;
-      if (soundToggleBtn) soundToggleBtn.classList.toggle('muted', soundMuted);
-      if (window.setBulletlineTickerSoundMuted) window.setBulletlineTickerSoundMuted(soundMuted);
+      syncSoundToggleUI();
       const weatherMusic = document.getElementById('weather-music-audio');
       const newsIntro = document.getElementById('news-intro-audio');
       if (!soundMuted) {
@@ -525,9 +536,20 @@
     }
 
     function globalUnlockAudio(e) {
+      if (soundEnabled) return; // one-shot — already unlocked
       if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       if (audioCtx.state === 'suspended') audioCtx.resume();
       soundEnabled = true;
+
+      // The toggle starts OFF. A touch anywhere else turns the sound on too —
+      // flip the button so it always shows the true state. A touch that starts
+      // on the button itself is left alone: the button's own tap toggles, so
+      // handling it here as well would flip it twice on one tap.
+      const tappedToggle = !!(e && e.target && e.target.closest && e.target.closest('#sound-toggle-btn'));
+      if (!tappedToggle && soundMuted) {
+        soundMuted = false;
+        syncSoundToggleUI();
+      }
 
       // Let other scripts on the page (e.g. the arrivals/departures ticker)
       // know the same "touch anywhere" gesture just unlocked audio, so they
@@ -1694,6 +1716,9 @@
     const startGameBtn = document.getElementById('start-game-btn');
     const startRow = document.getElementById('start-row');
     const soundToggleBtn = document.getElementById('sound-toggle-btn');
+    // Paint the initial OFF state (muted look). The ticker-mute half of the
+    // sync is a harmless no-op here — that script block loads after this one.
+    syncSoundToggleUI();
     // Load the question bank from questions.json (previously an inline array).
     // Start Game stays disabled until the fetch resolves and masterPDFDeck is built.
     startGameBtn.disabled = true;
@@ -1826,11 +1851,13 @@
 
     soundToggleBtn.addEventListener('click', (e) => {
       e.stopPropagation();
+      // The toggle is the sound switch: as the very first gesture it must also
+      // unlock audio (AudioContext + primed clips) before toggling. The unlock
+      // skips its auto-ON for taps starting on this button, so one tap can't
+      // flip the state twice.
+      if (!soundEnabled) globalUnlockAudio(e);
       soundMuted = !soundMuted;
-      soundToggleBtn.classList.toggle('muted', soundMuted);
-      soundToggleBtn.setAttribute('aria-label', soundMuted ? 'Unmute train sounds' : 'Mute train sounds');
-      soundToggleBtn.title = soundMuted ? 'Unmute train sounds' : 'Mute train sounds';
-      if (window.setBulletlineTickerSoundMuted) window.setBulletlineTickerSoundMuted(soundMuted);
+      syncSoundToggleUI();
       if (!soundMuted) playSound('countdown-tick');
 
       // The weather-music and news-intro clips are plain <audio> elements that,
@@ -1842,6 +1869,11 @@
       if (soundMuted) {
         if (weatherMusic && !weatherMusic.paused) weatherMusic.pause();
         if (newsIntro && !newsIntro.paused) newsIntro.pause();
+      } else if (welcomeTickerActive && weatherMusic && weatherMusic.paused && weatherMusic.currentTime === 0 && !weatherMusic.ended) {
+        // First-ever turn-on: the music never started, so begin at the weather
+        // step — sound starts right away instead of waiting a full cycle.
+        ledTickerLine2.stop();
+        ledTickerLine2.start(buildLine2Steps(), { loop: true, regenerate: buildLine2Steps });
       } else {
         if (weatherMusic && weatherMusic.paused && weatherMusic.currentTime > 0 && !weatherMusic.ended) {
           weatherMusic.play().catch(() => {});
