@@ -1115,6 +1115,31 @@
     const stickyBottomBar = document.getElementById('sticky-bottom-bar');
     const disclaimerFooter = document.getElementById('disclaimer-footer');
 
+    // Phone only (2026-10-05): pin both footers to the *visible* bottom.
+    // On Android the top address bar showing/hiding changes the page height
+    // under a plain `bottom: 0` footer, making it jump up/down while scrolling.
+    // Track the visual viewport live and offset the footers above any bottom
+    // browser chrome. No-op on desktop (offset computes to 0 there anyway).
+    function pinMobileFooters() {
+      if (!window.matchMedia('(max-width: 767px)').matches) {
+        disclaimerFooter.style.bottom = '';
+        stickyBottomBar.style.bottom = '';
+        return;
+      }
+      const vv = window.visualViewport;
+      let chromeBottom = 0;
+      if (vv) chromeBottom = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+      disclaimerFooter.style.bottom = chromeBottom + 'px';
+      stickyBottomBar.style.bottom = chromeBottom + 'px';
+    }
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', pinMobileFooters);
+      window.visualViewport.addEventListener('scroll', pinMobileFooters);
+    }
+    window.addEventListener('resize', pinMobileFooters);
+    window.addEventListener('orientationchange', pinMobileFooters);
+    pinMobileFooters();
+
     let currentBank = 0, timer = 60, timerInterval = null, playerPos = 5, trainXPos = 7, activeQuestion = null;
     let armedTicketBonuses = [], raceCorrectCount = 0, raceTicketBonusTotal = 0, raceHazardBountyTotal = 0;
     // Race state
