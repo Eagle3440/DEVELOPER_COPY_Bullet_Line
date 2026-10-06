@@ -261,24 +261,14 @@
       box-shadow: 0 0 18px rgba(0, 210, 255, 0.4);
     }
 
-    /* Small title-video links pinned to the bottom-center inside the title
-       picture (2026-10-06): hidden while a video plays or a game is running,
-       shown when the webp is back. Dark pill keeps them readable over the art. */
+    /* Small title-video links under the picture: hidden while a video plays
+       or a game is running, shown when the webp is back. */
     .title-video-links {
-      position: absolute;
-      bottom: 8px;
-      left: 50%;
-      transform: translateX(-50%);
       display: flex;
       gap: 20px;
       justify-content: center;
-      align-items: center;
-      padding: 6px 16px;
-      border-radius: 999px;
-      background: rgba(0, 8, 20, 0.55);
-      border: 1px solid rgba(212, 175, 55, 0.35);
-      white-space: nowrap;
-      z-index: 4;
+      margin-top: 8px;
+      z-index: 3;
     }
 
     .title-video-link {
