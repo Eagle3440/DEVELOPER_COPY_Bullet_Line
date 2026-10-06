@@ -31,7 +31,7 @@
   <meta property="og:url" content="https://eagle3440.github.io/scripture-pursuit/" />
   <meta property="og:type" content="website" />
 
-  <link rel="stylesheet" href="styles.css?v=23">
+  <link rel="stylesheet" href="styles.css?v=24">
   <script src="https://cdn.jsdelivr.net/npm/gameanalytics@4.0.0/umd/gameanalytics.min.js"></script>
 </head>
 <body>
@@ -140,10 +140,6 @@
           </div>
           <div id="total-treasury-display">TOTAL TREASURY: <span id="total-bank-val" class="bank-text">0 Shekels</span></div>
         </div>
-      </div>
-      <div id="title-video-links" class="title-video-links hidden">
-        <button class="title-video-link" type="button" data-video="time-tunnel.mp4">TIME TUNNEL</button>
-        <button class="title-video-link" type="button" data-video="jerusalem-entry.mp4">JERUSALEM ENTRY</button>
       </div>
     </div>
 
@@ -402,32 +398,21 @@
       if (iv && introVideoPlaying) iv.muted = soundMuted;
     }
 
-    // ---- Title videos (title-intro.mp4 + extras over the title-train picture) ----
-    // The intro autoplays on page load; the two extra videos play from the
-    // small title links under the picture. One video element, sized exactly to
+    // ---- Title intro video (title-intro.mp4 over the title-train picture) ----
+    // The intro autoplays on page load. One video element, sized exactly to
     // the webp box by CSS, layered above the picture but below the treasury
-    // status bar. When a video ends (or fails), the webp underneath comes back
-    // and the links return. The replay button restarts the intro on demand.
+    // status bar. When it ends (or fails), the webp underneath comes back.
+    // The replay button restarts the intro on demand.
     const TITLE_INTRO_SRC = 'title-intro.mp4';
-    function showTitleVideoLinks() {
-      const links = document.getElementById('title-video-links');
-      if (links) links.classList.remove('hidden');
-    }
-    function hideTitleVideoLinks() {
-      const links = document.getElementById('title-video-links');
-      if (links) links.classList.add('hidden');
-    }
     function showTitlePicture() {
       introVideoPlaying = false;
       const iv = document.getElementById('title-intro-video');
       if (iv) { iv.pause(); iv.classList.add('hidden'); }
-      showTitleVideoLinks();
     }
     function playTitleVideo(src) {
       const iv = document.getElementById('title-intro-video');
       if (!iv) return;
       if (iv.getAttribute('src') !== src) iv.setAttribute('src', src);
-      hideTitleVideoLinks();
       introVideoPlaying = true;
       iv.classList.remove('hidden');
       try { iv.currentTime = 0; } catch (e) {}
@@ -442,19 +427,12 @@
       const rb = document.getElementById('title-intro-replay');
       if (iv) { iv.pause(); iv.classList.add('hidden'); }
       if (rb) rb.classList.add('hidden');
-      hideTitleVideoLinks();
     }
     document.getElementById('title-intro-video').addEventListener('ended', showTitlePicture);
     document.getElementById('title-intro-video').addEventListener('error', showTitlePicture);
     document.getElementById('title-intro-replay').addEventListener('click', (e) => {
       e.stopPropagation();
       playTitleIntro();
-    });
-    document.querySelectorAll('.title-video-link').forEach((btn) => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        playTitleVideo(btn.dataset.video);
-      });
     });
     playTitleIntro(); // autoplay on page load
     // Tracks whether the welcome LED ticker (weather + news on line 2) is running,
@@ -3151,7 +3129,6 @@
       document.getElementById('title-train-img').classList.remove('hidden');
       document.getElementById('title-intro-video').classList.add('hidden');
       document.getElementById('title-intro-replay').classList.remove('hidden');
-      showTitleVideoLinks();
       introVideoPlaying = false;
       document.querySelector('.status-bar').classList.remove('boxed', 'building');
       disclaimerFooter.classList.remove('hidden');

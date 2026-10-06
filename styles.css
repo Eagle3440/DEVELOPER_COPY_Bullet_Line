@@ -261,35 +261,6 @@
       box-shadow: 0 0 18px rgba(0, 210, 255, 0.4);
     }
 
-    /* Small title-video links under the picture: hidden while a video plays
-       or a game is running, shown when the webp is back. */
-    .title-video-links {
-      display: flex;
-      gap: 20px;
-      justify-content: center;
-      margin-top: 8px;
-      z-index: 3;
-    }
-
-    .title-video-link {
-      background: none;
-      border: none;
-      padding: 4px 6px;
-      font-family: 'Montserrat', 'Segoe UI', sans-serif;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.22em;
-      color: #d4af37;
-      text-shadow: 0 0 8px rgba(212, 175, 55, 0.5);
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .title-video-link:hover {
-      color: #f7e7a1;
-      text-shadow: 0 0 12px rgba(212, 175, 55, 0.8);
-    }
-
     .train-logo-wrapper.run-chase {
       animation: trainArrival 2.5s ease-out forwards;
     }
@@ -2494,11 +2465,4 @@
     bottom: auto;
   }
 
-  /* --- Title extra videos (2026-10-06): Bill doesn't want the two extra
-         title videos playable on phone at all — hide their links here, so
-         they can never be tapped. The intro video + replay button are
-         unaffected on phone. --- */
-  .title-video-links {
-    display: none !important;
-  }
 }
