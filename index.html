@@ -458,11 +458,20 @@
     }
 
     let soundMutedBeforeFeedback = false;
+    let feedbackWeatherWasPlaying = false, feedbackNewsWasPlaying = false;
     function openFeedbackModal() {
       soundMutedBeforeFeedback = soundMuted;
       soundMuted = true;
       if (soundToggleBtn) soundToggleBtn.classList.add('muted');
       if (window.setBulletlineTickerSoundMuted) window.setBulletlineTickerSoundMuted(true);
+      // The weather-music and news-intro clips are plain <audio> elements:
+      // soundMuted only guards *starting* sounds, so pause them outright.
+      const weatherMusic = document.getElementById('weather-music-audio');
+      const newsIntro = document.getElementById('news-intro-audio');
+      feedbackWeatherWasPlaying = !!(weatherMusic && !weatherMusic.paused);
+      feedbackNewsWasPlaying = !!(newsIntro && !newsIntro.paused);
+      if (weatherMusic) weatherMusic.pause();
+      if (newsIntro) newsIntro.pause();
       document.getElementById('feedback-modal').classList.remove('hidden');
     }
     function closeFeedbackModal() {
@@ -470,6 +479,18 @@
       soundMuted = soundMutedBeforeFeedback;
       if (soundToggleBtn) soundToggleBtn.classList.toggle('muted', soundMuted);
       if (window.setBulletlineTickerSoundMuted) window.setBulletlineTickerSoundMuted(soundMuted);
+      const weatherMusic = document.getElementById('weather-music-audio');
+      const newsIntro = document.getElementById('news-intro-audio');
+      if (!soundMuted) {
+        // Resume only the clips that were playing when the form opened.
+        if (feedbackWeatherWasPlaying && weatherMusic && weatherMusic.paused) weatherMusic.play().catch(() => {});
+        if (feedbackNewsWasPlaying && newsIntro && newsIntro.paused) newsIntro.play().catch(() => {});
+      } else {
+        // Staying muted: make sure nothing kept playing underneath.
+        if (weatherMusic && !weatherMusic.paused) weatherMusic.pause();
+        if (newsIntro && !newsIntro.paused) newsIntro.pause();
+      }
+      feedbackWeatherWasPlaying = feedbackNewsWasPlaying = false;
     }
 
     function submitFeedbackAjax(event) {
