@@ -2365,4 +2365,13 @@
   #logo-header-box .status-bar:not(.boxed) #total-treasury-display {
     white-space: nowrap;
   }
+
+  /* --- Lock sideways movement (2026-10-05): the ticker text made the page
+         wider than the phone screen, so pages dragged left/right. Clip
+         x-overflow on html as well as body (body already had it); vertical
+         scrolling is untouched, and body flex keeps the page centered. --- */
+  html, body {
+    overflow-x: hidden;
+    max-width: 100%;
+  }
 }
