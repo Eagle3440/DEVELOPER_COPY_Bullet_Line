@@ -31,7 +31,7 @@
   <meta property="og:url" content="https://eagle3440.github.io/scripture-pursuit/" />
   <meta property="og:type" content="website" />
 
-  <link rel="stylesheet" href="styles.css?v=19">
+  <link rel="stylesheet" href="styles.css?v=21">
   <script src="https://cdn.jsdelivr.net/npm/gameanalytics@4.0.0/umd/gameanalytics.min.js"></script>
 </head>
 <body>
@@ -127,6 +127,8 @@
     <div id="logo-header-box" class="logo-container">
       <div id="main-title" class="train-logo-wrapper">
         <img id="title-train-img" src="title-train.webp" alt="The Bullet Line" class="train-title-image">
+        <video id="title-intro-video" class="title-intro-video" src="title-intro.mp4" muted playsinline preload="auto" aria-label="Title intro video"></video>
+        <button id="title-intro-replay" class="title-intro-replay" type="button" aria-label="Replay intro video" title="Replay intro video">&#8635;</button>
         <div class="status-bar">
           <div>TREASURY: <span id="bank-val" class="bank-text">0 Shekels</span><span id="combo-val" class="combo-text"></span></div>
           <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;">
@@ -380,6 +382,9 @@
     // unlock below — turns sound on.
     let soundMuted = true;
 
+    // True while the title intro video is on screen (autoplay or replay).
+    let introVideoPlaying = false;
+
     // One place that paints the toggle button + ticker mute from soundMuted.
     // Only called after full script evaluation (gestures, taps, modal), so the
     // button const below is always initialized by call time.
@@ -388,7 +393,45 @@
       soundToggleBtn.setAttribute('aria-label', soundMuted ? 'Unmute train sounds' : 'Mute train sounds');
       soundToggleBtn.title = soundMuted ? 'Unmute train sounds' : 'Mute train sounds';
       if (window.setBulletlineTickerSoundMuted) window.setBulletlineTickerSoundMuted(soundMuted);
+      // The title intro video follows the sound switch while it's playing.
+      const iv = document.getElementById('title-intro-video');
+      if (iv && introVideoPlaying) iv.muted = soundMuted;
     }
+
+    // ---- Title intro video (title-intro.mp4 over the title-train picture) ----
+    // Autoplays on page load, sized exactly to the webp box by CSS, layered
+    // above the picture but below the treasury status bar. When it ends (or
+    // fails to load), the webp underneath comes back. The replay button
+    // restarts it on demand.
+    function showTitlePicture() {
+      introVideoPlaying = false;
+      const iv = document.getElementById('title-intro-video');
+      if (iv) { iv.pause(); iv.classList.add('hidden'); }
+    }
+    function playTitleIntro() {
+      const iv = document.getElementById('title-intro-video');
+      if (!iv) return;
+      introVideoPlaying = true;
+      iv.classList.remove('hidden');
+      try { iv.currentTime = 0; } catch (e) {}
+      iv.muted = soundMuted; // follows the sound switch (starts muted: autoplay-safe)
+      const p = iv.play();
+      if (p && typeof p.catch === 'function') p.catch(() => showTitlePicture());
+    }
+    function hideTitleIntro() {
+      introVideoPlaying = false;
+      const iv = document.getElementById('title-intro-video');
+      const rb = document.getElementById('title-intro-replay');
+      if (iv) { iv.pause(); iv.classList.add('hidden'); }
+      if (rb) rb.classList.add('hidden');
+    }
+    document.getElementById('title-intro-video').addEventListener('ended', showTitlePicture);
+    document.getElementById('title-intro-video').addEventListener('error', showTitlePicture);
+    document.getElementById('title-intro-replay').addEventListener('click', (e) => {
+      e.stopPropagation();
+      playTitleIntro();
+    });
+    playTitleIntro(); // autoplay on page load
     // Tracks whether the welcome LED ticker (weather + news on line 2) is running,
     // so the audio-unlock handler can restart line 2 at the weather step and start
     // its music right when the weather segment starts.
@@ -1890,6 +1933,7 @@
       pendingCategoryId = (categoryId === undefined) ? null : categoryId;
       stopWelcomeLedTicker();
       document.getElementById('title-train-img').classList.add('hidden');
+      hideTitleIntro();
       document.querySelector('.status-bar').classList.add('boxed');
       disclaimerFooter.style.opacity = '0';
       setTimeout(() => disclaimerFooter.classList.add('hidden'), 300);
@@ -1933,6 +1977,7 @@
       stopWelcomeLedTicker();
       activeCategoryFilter = categoryId || null;
       document.getElementById('title-train-img').classList.add('hidden');
+      hideTitleIntro();
       document.querySelector('.status-bar').classList.add('boxed');
       disclaimerFooter.style.opacity = '0';
       setTimeout(() => disclaimerFooter.classList.add('hidden'), 300);
@@ -3079,6 +3124,9 @@
       if (timerInterval) clearInterval(timerInterval);
 
       document.getElementById('title-train-img').classList.remove('hidden');
+      document.getElementById('title-intro-video').classList.add('hidden');
+      document.getElementById('title-intro-replay').classList.remove('hidden');
+      introVideoPlaying = false;
       document.querySelector('.status-bar').classList.remove('boxed', 'building');
       disclaimerFooter.classList.remove('hidden');
       disclaimerFooter.style.opacity = '1';
