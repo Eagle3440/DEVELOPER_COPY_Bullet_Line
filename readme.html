@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How to Play — Bullet Line: Scripture Pursuit (KJV)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;0,900;1,600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#d3e3fa; --card:#ffffff; --ink:#2b2b2b; --muted:#707070;
+    --blue:#1a56db; --navy:#0a1424; --line:#d8e2f0;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0; color:var(--ink);
+    font-family:'Source Serif 4',Georgia,'Times New Roman',serif;
+    font-size:17px; line-height:1.75;
+    background:var(--paper);
+    min-height:100vh;
+  }
+  .page{max-width:800px;margin:0 auto;padding:64px 24px 80px;}
+
+  /* ---------- document header ---------- */
+  header{text-align:center;margin-bottom:40px;}
+  .doc-emoji{font-size:42px;margin-bottom:16px;line-height:1;}
+  .kicker{
+    font-family:'Montserrat',sans-serif;
+    color:var(--blue);font-size:11px;font-weight:700;letter-spacing:.32em;
+    text-transform:uppercase;margin-bottom:18px;
+  }
+  h1{
+    font-family:'Playfair Display',Georgia,serif;font-weight:900;
+    color:#0a1424;font-size:clamp(30px,5vw,44px);
+    letter-spacing:.01em;margin:0 0 18px;
+  }
+  .rule{display:flex;align-items:center;justify-content:center;margin:0 auto 18px;max-width:420px;}
+  .rule .dot{flex:0 0 auto;width:9px;height:9px;border-radius:9999px;border:1px solid var(--blue);background:transparent;}
+  .rule .bar{flex:1 1 auto;height:1px;background:linear-gradient(90deg,transparent,var(--blue),transparent);margin:0 12px;}
+  .meta{
+    font-family:'Montserrat',sans-serif;
+    color:var(--muted);font-size:12px;letter-spacing:.16em;text-transform:uppercase;
+  }
+  .meta strong{color:var(--blue);font-weight:600;}
+
+  /* ---------- table of contents ---------- */
+  .toc{
+    background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:24px 30px;margin-bottom:34px;
+    box-shadow:0 6px 24px rgba(20,60,140,.06);
+  }
+  .toc-label{
+    font-family:'Montserrat',sans-serif;
+    color:var(--blue);font-size:11px;font-weight:700;letter-spacing:.26em;
+    text-transform:uppercase;margin-bottom:14px;
+  }
+  .toc ol{list-style:none;margin:0;padding:0;columns:2;column-gap:36px;}
+  .toc li{margin-bottom:9px;break-inside:avoid;}
+  .toc a{
+    color:var(--ink);text-decoration:none;font-size:15px;
+    display:flex;align-items:baseline;gap:10px;
+  }
+  .toc a:hover{color:var(--blue);}
+  .toc a:hover .t{text-decoration:underline;text-underline-offset:3px;}
+  .toc .n{
+    font-family:'Montserrat',sans-serif;
+    color:var(--blue);font-size:11px;font-weight:700;letter-spacing:.08em;flex:0 0 auto;
+  }
+
+  /* ---------- body card ---------- */
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);border-radius:14px;
+    padding:12px 44px 34px;
+    box-shadow:0 10px 34px rgba(20,60,140,.08);
+  }
+  section{padding:26px 0;border-bottom:1px solid var(--line);}
+  section:last-child{border-bottom:none;padding-bottom:8px;}
+  h2{
+    font-family:'Playfair Display',Georgia,serif;font-weight:700;
+    color:#0a1424;font-size:21px;letter-spacing:.01em;
+    margin:0 0 12px;display:flex;align-items:center;gap:14px;
+  }
+  h2 .e{font-size:24px;flex:0 0 auto;}
+  h3{
+    font-family:'Montserrat',sans-serif;font-weight:700;
+    color:#0a1424;font-size:15px;letter-spacing:.02em;
+    margin:22px 0 8px;
+  }
+  p{margin:0 0 12px;}
+  p:last-child{margin-bottom:0;}
+  strong{color:#111;font-weight:600;}
+  a{color:var(--blue);}
+  ul,ol{margin:0 0 12px;padding-left:26px;}
+  li{margin-bottom:8px;}
+  li:last-child{margin-bottom:0;}
+  ul ul,ol ul{margin-top:8px;}
+  table{
+    width:100%;border-collapse:collapse;margin:0 0 14px;
+    font-family:'Montserrat',sans-serif;font-size:14px;
+  }
+  th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);}
+  th{
+    color:var(--blue);font-size:11px;font-weight:700;letter-spacing:.14em;
+    text-transform:uppercase;border-bottom:2px solid var(--blue);
+  }
+  tr:last-child td{border-bottom:none;}
+  pre{
+    background:#f4f7fd;border:1px solid var(--line);border-radius:10px;
+    padding:18px 22px;overflow-x:auto;margin:0 0 12px;
+    font-family:'Courier New',monospace;font-size:13.5px;line-height:1.7;color:#0a1424;
+  }
+  code{font-family:'Courier New',monospace;font-size:.92em;}
+
+  /* ---------- footer ---------- */
+  footer{text-align:center;margin-top:36px;}
+  .back{
+    font-family:'Montserrat',sans-serif;
+    display:inline-block;font-size:12px;font-weight:700;
+    letter-spacing:.2em;text-transform:uppercase;text-decoration:none;
+    border:1px solid rgba(26,86,219,.6);border-radius:9999px;padding:14px 30px;
+    color:var(--blue);background:#fff;
+    transition:border-color .2s, background .2s;
+  }
+  .back:hover{border-color:var(--blue);background:#edf3fe;}
+  .copy{
+    font-family:'Montserrat',sans-serif;
+    margin-top:22px;color:var(--muted);font-size:12px;letter-spacing:.1em;
+  }
+  @media (max-width:640px){
+    .page{padding:44px 16px 60px;}
+    .toc ol{columns:1;}
+    .card{padding:8px 24px 26px;}
+    h2{font-size:19px;}
+    body{font-size:16px;}
+    table{font-size:12.5px;}
+    th,td{padding:8px 8px;}
+  }
+
+  @media print{
+    body{background:#fff;}
+    .page{max-width:none;padding:0;}
+    .card,.toc{box-shadow:none;}
+    .back{display:none;}
+  }
+</style>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-0NYTRH8V3D"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-0NYTRH8V3D');
+  </script>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <div class="doc-emoji">&#128214;</div>
+      <div class="kicker">Bullet Line: Scripture Pursuit (KJV)</div>
+      <h1>How to Play</h1>
+      <div class="rule" aria-hidden="true">
+        <span class="dot"></span><span class="bar"></span><span class="dot"></span>
+      </div>
+      <div class="meta">The complete guide to <strong>riding the Bullet Line</strong></div>
+    </header>
+
+    <nav class="toc" aria-label="Table of contents">
+      <div class="toc-label">Contents</div>
+      <ol>
+        <li><a href="#s1"><span class="n">&#128640;</span><span class="t">Core Features</span></a></li>
+        <li><a href="#s2"><span class="n">&#127918;</span><span class="t">How to Play</span></a></li>
+        <li><a href="#s3"><span class="n">&#128176;</span><span class="t">Treasury Management System</span></a></li>
+        <li><a href="#s4"><span class="n">&#127903;</span><span class="t">The Ticket Store</span></a></li>
+        <li><a href="#s5"><span class="n">&#128202;</span><span class="t">Game Summary Report</span></a></li>
+        <li><a href="#s6"><span class="n">&#128218;</span><span class="t">Learning Library</span></a></li>
+        <li><a href="#s7"><span class="n">&#9888;&#65039;</span><span class="t">Hazard Events</span></a></li>
+        <li><a href="#s8"><span class="n">&#128260;</span><span class="t">Question Deck Shuffle Logic</span></a></li>
+        <li><a href="#s9"><span class="n">&#128240;</span><span class="t">The Jerusalem Herald News Ticker</span></a></li>
+        <li><a href="#s10"><span class="n">&#128172;</span><span class="t">Feedback</span></a></li>
+        <li><a href="#s11"><span class="n">&#128193;</span><span class="t">Project Structure</span></a></li>
+        <li><a href="#s12"><span class="n">&#128220;</span><span class="t">License</span></a></li>
+      </ol>
+    </nav>
+
+    <main class="card">
+      <section id="s1">
+        <h2><span class="e">&#128640;</span>Core Features</h2>
+        <ul>
+          <li><strong>KJV Scripture Integration:</strong> Every trivia question is paired with a direct King James Bible reference and scripture quote to deepen your study and understanding of the Word.</li>
+          <li><strong>The Shekel Builder Round:</strong> A fast-paced 60-second opening round where consecutive correct answers pay a rising combo ladder -- 1,000 -&gt; 1,250 -&gt; 1,500 -&gt; 1,750 -&gt; 2,000 Shekels of Silver. Five in a row banks 1 AUTO STALL + 1 AUTO ADVANCE and restarts the ladder; a miss resets it to 1,000.</li>
+          <li><strong>Choose Your Opponent:</strong> After START GAME, pick your rival's smarts -- <strong>Scribe</strong> (68% accuracy, x1 win bonus), <strong>Scholar</strong> (76% accuracy, x1.25 win bonus), or <strong>Prophet</strong> (84% accuracy, x1.5 win bonus). Sharper mind, richer win. Your choice is remembered between visits.</li>
+          <li><strong>Head-to-Head Race Mechanics:</strong> A 7-step sprint against the rival Train X -- you board at Step 5, 6, or 7 depending on the line you choose, and the first to reach the station (Step 0) wins. Correct answers advance your Bullet Line; Train X advances on its own hidden accuracy roll each round.</li>
+          <li><strong>Hazard Events:</strong> Up to one Bible-themed track hazard per race (round 4 or later, never in sudden death) -- Bridge Out, the Red Sea, Daniel's Lions, the Fiery Furnace, and 10 more, drawn from a shuffled no-repeat deck. The race question doubles as your dodge test: answer correctly to dodge it, miss and you're knocked back a step.</li>
+          <li><strong>Rivalry Record:</strong> Your lifetime win-loss record against each opponent is tracked and shown as a badge on their card (FIRST MEETING, gold when you're leading, red when trailing) and as a W-L card on every game summary.</li>
+          <li><strong>Learning Library:</strong> Every question you miss is saved as a KJV verse flashcard. Review them from the summary screen -- tap to flip, mark MASTERED to remove, and resize the verse text with the -/+ buttons.</li>
+          <li><strong>The Ticket Store:</strong> Spend your lifetime Total Treasury on five themed question packs -- each unlocking hundreds of additional KJV questions and a matching category-only way to play. See below for details.</li>
+          <li><strong>Procedural Web Audio API Sound Effects:</strong> Sound effects and train ambient audio generated programmatically via JavaScript -- no audio assets required for gameplay. The title-screen weather music is embedded in the page.</li>
+          <li><strong>The Jerusalem Herald News Ticker:</strong> A two-line LED marquee on the title screen delivers scrolling local weather and a rotating feed of KJV-inspired "breaking news" headlines -- see below for details.</li>
+          <li><strong>Responsive &amp; Immersive UI:</strong> Features a custom neon train CSS layout, animated fog background, mobile-optimized scripture viewing drawers, and dynamic game statistics tracking.</li>
+        </ul>
+      </section>
+
+      <section id="s2">
+        <h2><span class="e">&#127918;</span>How to Play</h2>
+        <ol>
+          <li><strong>Start the Game:</strong> Click the <strong>START GAME</strong> button on the main screen, then <strong>choose your opponent</strong> -- Scribe, Scholar, or Prophet. Tapping a card starts the race.</li>
+          <li><strong>The Builder Round:</strong> Answer as many KJV Bible questions as you can within 60 seconds to stack up your starting Shekels of Silver. Streaks pay extra: 5 correct in a row banks 1 AUTO STALL and 1 AUTO ADVANCE together (max 1 each), and the streak resets.</li>
+          <li><strong>Choose Your Line:</strong> Pick how you enter the race -- each line races for a different share of your bank:
+            <ul>
+              <li><strong>Express Line</strong> -- boards at Step 5, keeps the AUTO ADVANCE (forfeits the AUTO STALL), races for <strong>half</strong> your bank.</li>
+              <li><strong>Brake Line</strong> -- boards at Step 6, keeps the AUTO STALL (forfeits the AUTO ADVANCE), races for your <strong>full</strong> bank.</li>
+              <li><strong>Engineer Line</strong> -- boards at Step 7 and races for <strong>triple</strong> your bank -- "Triple or nothing." No builder bonuses.</li>
+            </ul>
+            <p>AUTO STALL is emergency-only and Brake-only: it fires automatically only when Train X is one step from the station and about to take it. AUTO ADVANCE is emergency-only and Express-only: it fires automatically only when Train X is one step from the station and about to take it while you are one step away -- the Express surges to the station, turning defeat into a sudden-death tiebreak. The player is told what happened via an on-screen banner in both cases.</p>
+          </li>
+          <li><strong>Mystery Ticket Bonus:</strong> each Ticket Store pack purchased secretly banks one random Shekel bonus (1st ticket: 1-20,000, 2nd: 1-30,000, 3rd: 1-40,000, +10k per ticket -- one amount per ticket). Nothing is revealed at purchase. At race start each bonus arms a secret trigger (a random correct-answer number, 1-8); answering that race question correctly fires a gold "&#127903; TICKET BONUS!" banner (stays 8 seconds) adding the Shekels to the race bank -- win the race to keep it, and the win summary itemizes the bonus so you can see what you got. Unfired bonuses stay armed for future races.</li>
+          <li><strong>The Race:</strong> Answer questions to advance your Bullet Line to the station (Step 0) before Train X gets there. Train X runs at the accuracy of the opponent you picked (Scribe 68%, Scholar 76%, Prophet 84%, adjusted slightly by question difficulty each round). Watch for <strong>hazard events</strong> -- at most one per race, never before round 4 and never in sudden death: a hazard card appears with a thunder-rumble warning, and the race question becomes your dodge test. Answer correctly to dodge it (green DODGED flash); miss and the hazard knocks you back one step (red HIT flash). Win the race to bank your Builder total multiplied by your opponent's win bonus (x1 / x1.25 / x1.5). If both trains cross together, a sudden-death question decides it!</li>
+          <li><strong>End of Race:</strong> When the race ends, the steps collapse one by one (7-&gt;1, then the TRAIN STATION bar -- 8 clacks total), then a cinematic plays: <code>win.mp4</code> on victory, <code>lose.mp4</code> on defeat (a placeholder panel with 3-second auto-continue appears if the video file is missing). After the video, the Game Summary Report slides up over the emptied board.</li>
+        </ol>
+        <p>If you've bought one or more question packs from the Ticket Store (see below), the title screen also offers a <strong>category-only play</strong> option, drawing questions solely from that pack's books of the Bible instead of the full mixed deck.</p>
+      </section>
+      <section id="s3">
+        <h2><span class="e">&#128176;</span>Treasury Management System</h2>
+        <p>The game tracks your biblical wealth across three distinct metrics:</p>
+        <p><strong>Starting over:</strong> If you clear your browser's data (or localStorage) for this site, everything resets -- treasuries, owned ticket packs, rivalry records, Learning Library cards -- as if you'd never played. There is no account and no backup, so cleared data cannot be recovered.</p>
+        <h3>TREASURY (Current Game Bank)</h3>
+        <ul>
+          <li><strong>What it is:</strong> The amount of Shekels you've earned in the current game session.</li>
+          <li><strong>When it updates:</strong> Increases per correct answer during the Builder Round on the combo ladder -- 1,000 -&gt; 1,250 -&gt; 1,500 -&gt; 1,750 -&gt; 2,000 Shekels for consecutive correct answers (a miss resets it to 1,000).</li>
+          <li><strong>When it resets:</strong> Resets to 0 Shekels when you start a new game or finish the current one.</li>
+          <li><strong>Display:</strong> Shows at the top-left of the screen during gameplay.</li>
+        </ul>
+        <h3>TOTAL TREASURY (Running Tally)</h3>
+        <ul>
+          <li><strong>What it is:</strong> The cumulative total of all Shekels earned across every won game, ever.</li>
+          <li><strong>When it updates:</strong> Only increases when you <strong>win</strong> a game (reach the Train Station). Your Builder total is multiplied by your chosen opponent's win bonus -- x1 (Scribe), x1.25 (Scholar), or x1.5 (Prophet) -- before it's banked. Losses don't add to this total. It also <strong>decreases</strong> when you spend it on a question pack in the Ticket Store.</li>
+          <li><strong>When it resets:</strong> Never resets automatically -- it's a persistent running tally saved in browser localStorage under the key <code>totalTreasuryAccount</code>, and it carries forward across page reloads and browser sessions (and is shared with the Ticket Store -- see below). You can manually clear it only by clearing your browser's localStorage.</li>
+          <li><strong>Display:</strong> Shows at the top-right of the screen during gameplay.</li>
+          <li><strong>Purpose:</strong> Tracks your all-time success across every game you've ever played on this device/browser, and doubles as your spending balance in the Ticket Store.</li>
+        </ul>
+        <h3>&#127942; HIGH SCORE TREASURY (Persistent Record)</h3>
+        <ul>
+          <li><strong>What it is:</strong> The single highest TREASURY amount you've ever earned in a game.</li>
+          <li><strong>When it updates:</strong> Automatically updates whenever you complete a game with more Shekels than your previous high score.</li>
+          <li><strong>When it resets:</strong> Never resets automatically--persists forever until you beat it. You can manually clear it only by clearing your browser's localStorage.</li>
+          <li><strong>Storage:</strong> Saved in browser localStorage under the key <code>treasuryHighScore</code>.</li>
+          <li><strong>Display:</strong> Shows above the train board during the Race (only during active gameplay, not on the title screen).</li>
+          <li><strong>Purpose:</strong> Gives you a challenge to beat across sessions--a personal record to surpass.</li>
+        </ul>
+        <h3>Example Scenario</h3>
+<pre>Starting Point (from previous play):
+  - HIGH SCORE: 5,000 Shekels
+  - TOTAL TREASURY: 12,000 Shekels
+
+Game 1 (Win with 3,000):
+  - TREASURY: 3,000 Shekels  game ends, resets to 0
+  - TOTAL TREASURY: 15,000 Shekels (12,000 + 3,000, saved to localStorage)
+  - HIGH SCORE: Still 5,000 (didn't beat it)
+
+Game 2 (Win with 6,000):
+  - TREASURY: 6,000 Shekels  game ends, resets to 0
+  - TOTAL TREASURY: 21,000 Shekels (15,000 + 6,000)
+  - HIGH SCORE: 6,000 Shekels &#127881; (NEW HIGH SCORE!)
+
+Game 3 (Lose, earn 0):
+  - TREASURY: 0 Shekels (crashed before banking)
+  - TOTAL TREASURY: 21,000 Shekels (losses don't add)
+  - HIGH SCORE: Still 6,000 Shekels
+
+Page reload/new browser session:
+  - TOTAL TREASURY: Still 21,000 Shekels (persists, does not reset)</pre>
+      </section>
+
+      <section id="s4">
+        <h2><span class="e">&#127903;</span>The Ticket Store</h2>
+        <p><code>store.html</code> is a standalone page, styled to match the main game, where you spend your <strong>TOTAL TREASURY</strong> on five themed "Bullet Train Ticket" question packs. It shares the <code>totalTreasuryAccount</code> localStorage balance directly with the game -- so Shekels you've banked from winning games are exactly what you spend here, and the balance updates live in both places.</p>
+        <table>
+          <tr><th>Pack</th><th>Covers</th><th>Questions</th><th>Price</th></tr>
+          <tr><td><strong>Torah</strong></td><td>Genesis - Deuteronomy</td><td>194</td><td>50,000 Shekels</td></tr>
+          <tr><td><strong>Kings &amp; History</strong></td><td>Joshua - Esther</td><td>168</td><td>250,000 Shekels</td></tr>
+          <tr><td><strong>Prophets &amp; Wisdom</strong></td><td>Psalms - Malachi</td><td>128</td><td>500,000 Shekels</td></tr>
+          <tr><td><strong>Gospels</strong></td><td>Matthew - John</td><td>234</td><td>125,000 Shekels</td></tr>
+          <tr><td><strong>Epistles &amp; Revelation</strong></td><td>Acts - Revelation</td><td>177</td><td>1,000,000 Shekels</td></tr>
+        </table>
+        <ul>
+          <li><strong>Free questions:</strong> 100 questions are always available at no cost, regardless of which packs you own.</li>
+          <li><strong>Total question bank:</strong> 100 free + 901 across the five packs = <strong>1,001 questions</strong>.</li>
+          <li><strong>What buying unlocks:</strong> Owned packs are saved to localStorage (<code>bulletline_owned_packs</code>) and read directly by the main game -- their questions are added to the mixed deck immediately, and a category-only play option appears on the title screen for each owned pack.</li>
+          <li><strong>BUY TICKET prompt:</strong> A glowing "BUY TICKET" link appears once your Total Treasury is enough to afford the next-cheapest pack you don't yet own, nudging you toward the store. It stops glowing once dismissed, and won't reappear until your treasury grows further.</li>
+          <li><strong>The ARRIVALS/DEPARTURES board explains itself:</strong> The split-flap board on the title screen lists a "train line" for each of the five packs. A line shows a normal running status (ON TIME, BOARDING NOW, or a DELAY) if you own that pack, or <strong>LOCKED</strong> if you don't. A caption under the board header explains what LOCKED means, and clicking a LOCKED row takes you straight to the Ticket Store to buy it.</li>
+          <li><strong>Note:</strong> Spending Shekels in the store permanently reduces your Total Treasury balance -- there's no separate in-store currency.</li>
+        </ul>
+      </section>
+
+      <section id="s5">
+        <h2><span class="e">&#128202;</span>Game Summary Report</h2>
+        <p>After each game concludes (win or loss), a detailed <strong>Game Summary Report</strong> is displayed showing:</p>
+        <ul>
+          <li><strong>Question-by-Question Breakdown:</strong> Every question you answered during the game, listed in order with:
+            <ul>
+              <li>Your choice vs. the correct answer</li>
+              <li>Result badge (&#10003; CORRECT or &#10007; INCORRECT)</li>
+              <li>The KJV scripture reference paired with each question</li>
+              <li>The full scripture text for deeper study</li>
+            </ul>
+          </li>
+          <li><strong>High Score Banner:</strong>
+            <ul>
+              <li>If you set a <strong>new high score</strong> (win only): An Electric Blue <strong>NEW HIGH SCORE</strong> banner appears at the very top of the summary, showing your record Shekel total.</li>
+              <li>If you won without a new record: A panel shows your final score, the high score to beat, and how many Shekels away you were.</li>
+              <li>If you lost: An Electric Blue <strong>OUTRUN</strong> banner appears at the very top, showing your 0-Shekel score and the high score to beat.</li>
+            </ul>
+          </li>
+          <li><strong>Rivalry Record:</strong> A blue W-L card shows your lifetime record against the opponent you just faced (e.g. RIVALRY / vs the Scribe -- 1-0). Records persist in localStorage (<code>bulletline_rivalry</code>) and also appear as badges on the opponent-select cards: FIRST MEETING for a fresh matchup, gold when you're leading or tied, red when you're trailing.</li>
+          <li><strong>Ticket Bonus Breakdown:</strong> On a win where a Mystery Ticket Bonus fired, a gold "&#127903; TICKET BONUS: +X Shekels" line shows exactly how much of your total came from your mystery ticket reward.</li>
+          <li><strong>Opponent Bounty:</strong> On a win against Scholar or Prophet, a line names the opponent you beat and the win bonus applied (x1.25 / x1.5).</li>
+          <li><strong>Game Statistics:</strong> A running total at the bottom tracks total games played, games won, and games lost for the current browser session (these counters are in-memory only and reset on page reload -- unlike TOTAL TREASURY and HIGH SCORE, they are not saved to localStorage).</li>
+          <li><strong>Print Report:</strong> Click the <strong>&#128438;&#65039; Print</strong> button next to the report title to open a print-friendly popup window with all questions, answers, scripture references, and formatting -- perfect for saving as a PDF or printing a physical copy for personal record-keeping.</li>
+          <li><strong>Restart:</strong> Start a fresh game immediately from the summary screen.</li>
+        </ul>
+        <p>Separately, a <strong>SHARE</strong> link in the top navigation (available any time, not just after a game) opens a Facebook share dialog for the game's own URL -- it shares the game itself, not your individual results.</p>
+        <p>This report helps reinforce biblical knowledge, track your progress over multiple play sessions, see how close you came to beating your personal high score, and generate a printable record of your gameplay.</p>
+      </section>
+
+      <section id="s6">
+        <h2><span class="e">&#128218;</span>Learning Library</h2>
+        <p>Every question you miss -- in the Shekel Builder, the race, or sudden death -- is saved as a KJV verse flashcard in your <strong>Learning Library</strong> (stored in localStorage as <code>bulletline_learning_library</code>, one card per verse, deduplicated by reference). The cards say nothing about the game, your wrong answer, or the right one -- just the verse.</p>
+        <ul>
+          <li><strong>Opening it:</strong> After a game where you missed questions, the summary shows a <strong>LEARNING LIBRARY</strong> button ("N new verses waiting for you -&gt;") with a gold NEW badge while you have unreviewed verses.</li>
+          <li><strong>Flip cards:</strong> The front shows the scripture reference with a KJV badge; tap to flip to the verse text on the back.</li>
+          <li><strong>MASTERED</strong> removes the card from your library; <strong>NEXT -&gt;</strong> keeps it and moves on. A counter shows your place (N of M).</li>
+          <li><strong>Text size:</strong> <strong>-</strong> and <strong>+</strong> buttons above the card resize the verse text (0.8-2.5rem) -- your size is remembered and applies to every card.</li>
+          <li><strong>Honor system:</strong> There is no quiz or test mode -- review is on your conscience.</li>
+        </ul>
+      </section>
+      <section id="s7">
+        <h2><span class="e">&#9888;&#65039;</span>Hazard Events</h2>
+        <p>The race isn't just you versus Train X -- the track itself fights back. A 14-card hazard deck (Bridge Out, the Red Sea, Jonah's Storm, Jericho Walls, Daniel's Lions, the Fiery Furnace, Elijah's Whirlwind, Locust Swarm, Earth Quakes, Jordan Overflows, Hornets, Frogs, Thunder on Mount Sinai, Earth Opens) is shuffled once per session with no repeats until every card has been seen.</p>
+        <ul>
+          <li><strong>Trigger rules:</strong> At most one hazard per race, never before round 4, never in sudden death -- roughly a 30% chance on each eligible round.</li>
+          <li><strong>The dodge:</strong> When a hazard triggers, its card appears alone with a thunder-rumble warning and an explicit red CONTINUE button. Tap through, and the race question becomes your dodge test -- answer correctly to advance normally (green <strong>DODGED!</strong> flash), miss and the hazard knocks you back one step (red <strong>HIT!</strong> flash, never below your boarding step range cap of step 7). Train X is unaffected.</li>
+          <li><strong>Bounty cards:</strong> Two hazards pay a Shekel bounty for a successful dodge -- Daniel's Lions (10,000 Shekels) and the Fiery Furnace (5,000 Shekels). The card tells you the bounty up front; dodging adds it to your race bank (win the race to keep it) with a "BOUNTY!" banner, and the win summary itemizes it.</li>
+          <li><strong>The summary</strong> marks hazard rounds so you can see where the track bit you.</li>
+        </ul>
+      </section>
+
+      <section id="s8">
+        <h2><span class="e">&#128260;</span>Question Deck Shuffle Logic</h2>
+        <p>The game uses a <strong>smart deck shuffling system</strong> to ensure a fresh experience while preventing question fatigue:</p>
+        <ul>
+          <li><strong>Session Persistence:</strong> Used question IDs are tracked in browser localStorage (<code>bulletline_used_questions</code>), preventing the same question from appearing twice in a single session.</li>
+          <li><strong>Automatic Reshuffling:</strong> When all available questions have been asked (accounting for which category, if any, and which paid packs you own), a shuffle modal appears notifying you that the deck is being reset. The used question log is cleared, and every available question becomes eligible again.</li>
+          <li><strong>Graceful Fallback:</strong> If localStorage is unavailable (e.g., private browsing mode or embedded browsers), the question deck still tracks usage in-memory for that session only--you won't replay questions until you reload the page.</li>
+          <li><strong>Randomized Draw:</strong> Active questions are randomly shuffled on each reset to ensure varied game experiences.</li>
+          <li><strong>No manual reset control:</strong> A previous version of the game had a manual "Reshuffle Deck" button on the title screen. It has since been intentionally removed -- deck shuffling is now handled entirely by the automatic system above, and there is no manual override on the title screen.</li>
+        </ul>
+      </section>
+
+      <section id="s9">
+        <h2><span class="e">&#128240;</span>The Jerusalem Herald News Ticker</h2>
+        <p>The title screen features a two-line scrolling LED ticker themed as a fictional news network, "The Jerusalem Herald":</p>
+        <ul>
+          <li><strong>Line 1</strong> cycles through welcome and promotional messages.</li>
+          <li><strong>Line 2</strong> alternates between a local weather readout ("YOUR LOCAL WEATHER IN THE HOLY LAND") and batches of KJV-inspired news headlines, each labeled with the "JERUSALEM HERALD" masthead (styled gold) and a status tag (styled red -- normally "BREAKING NEWS," see below).</li>
+        </ul>
+        <p><strong>Randomized playback:</strong> Every time Line 2 finishes a pass -- including each time it loops -- the news headlines are freshly shuffled into a new random order, and are broken into randomly-sized batches of 1 to 5 stories between each weather segment (rather than a fixed count), so the sequence and grouping is different every time.</p>
+        <p><strong>Weather audio:</strong> Background weather music fades out automatically the moment a news headline begins, whenever that headline appears in the rotation.</p>
+        <p><strong>Headline library:</strong> Line 2 currently draws from 41 headlines spanning both Old and New Testament events (Creation, the Flood, the Exodus, the judges and kings, the exile, the life and ministry of Jesus, and the early church), written in a tabloid "breaking news" voice. A number of headlines involving Jesus explicitly proclaim His identity -- as the Christ, the Son of God, and the Savior of the world who came to save mankind from sin -- in addition to reporting the event itself.</p>
+        <ul>
+          <li><strong>Status tags:</strong> Most headlines run under the default <strong>"BREAKING NEWS"</strong> tag. A headline can instead carry a custom tag when "breaking news" wouldn't make sense for it -- for example, the Noah's Ark headline is framed as a retrospective, first-person recollection from an aged Noah rather than same-day coverage (since only his family of eight would have survived to report it), and runs under a <strong>"SPECIAL REPORT"</strong> tag instead.</li>
+        </ul>
+      </section>
+
+      <section id="s10">
+        <h2><span class="e">&#128172;</span>Feedback</h2>
+        <p>A <strong>FEEDBACK</strong> link in the top navigation opens an in-page form for sending questions, comments, or suggestions about the game directly to the developer's email.</p>
+      </section>
+
+      <section id="s11">
+        <h2><span class="e">&#128193;</span>Project Structure</h2>
+        <p>The project is organized into a handful of files rather than a single monolithic one, separating the question data and styling from the application logic:</p>
+        <ul>
+          <li><code>index.html</code> -- The core application: HTML structure, SVG graphics, audio synthesis logic, and game logic.</li>
+          <li><code>styles.css</code> -- All CSS styling, including the neon train layout, animated fog background, mobile-optimized scripture drawers, and news ticker styling.</li>
+          <li><code>questions.json</code> -- The KJV question bank (100 free questions plus 901 across the five Ticket Store packs -- 1,001 total), including scripture references, quotes, and answer choices.</li>
+          <li><code>store.html</code> -- The standalone Ticket Store page described above, sharing the game's branding, fog background, and visual style.</li>
+          <li><code>logo.png</code> -- The game's logo image.</li>
+          <li><code>LICENSE</code> -- Project license terms (plain text).</li>
+          <li><code>license.html</code> -- The same license terms as a styled web page.</li>
+        </ul>
+      </section>
+
+      <section id="s12">
+        <h2><span class="e">&#128220;</span>License</h2>
+        <p>(c) 2026 William Monti. All rights reserved.</p>
+        <p>This game is proprietary software. See the LICENSE file for the full terms: no copying, modifying, distributing, or selling any part of the game without written permission.</p>
+      </section>
+    </main>
+
+    <footer>
+      <a class="back" href="index.html">&larr; Back to the Game</a>
+      <p class="copy">&copy; 2026 William Monti. All rights reserved.</p>
+    </footer>
+  </div>
+</body>
+</html>
