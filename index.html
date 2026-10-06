@@ -398,15 +398,17 @@
       if (iv && introVideoPlaying) iv.muted = soundMuted;
     }
 
-    // ---- Title intro video (title-intro.mp4 over the title-train picture) ----
+    // ---- Title video rotation (over the title-train picture) ----
     // The intro autoplays on page load. One video element, sized exactly to
     // the webp box by CSS, layered above the picture but below the treasury
-    // status bar. When it ends (or fails), the webp underneath comes back.
-    // The replay button restarts the intro on demand. While the title screen
-    // is showing, the intro also replays on its own every 5 minutes.
-    const TITLE_INTRO_SRC = 'title-intro.mp4';
+    // status bar. When a video ends (or fails), the webp underneath comes back.
+    // While the title screen is showing, the videos rotate on their own every
+    // 5 minutes: intro -> time-tunnel -> jerusalem-entry -> intro ...
+    // The replay button replays the intro (restarts the rotation).
+    const TITLE_PLAYLIST = ['title-intro.mp4', 'time-tunnel.mp4', 'jerusalem-entry.mp4'];
     const TITLE_INTRO_REPLAY_MS = 5 * 60 * 1000;
     let titleIntroTimer = null;
+    let titlePlaylistIdx = 0;
     function clearTitleIntroTimer() {
       if (titleIntroTimer) { clearTimeout(titleIntroTimer); titleIntroTimer = null; }
     }
@@ -416,7 +418,9 @@
         titleIntroTimer = null;
         // Backstop: a game start clears the timer via hideTitleIntro, so this
         // should only fire on the title screen — but never replay mid-game.
-        if (!document.getElementById('start-game-btn').classList.contains('hidden')) playTitleIntro();
+        if (!document.getElementById('start-game-btn').classList.contains('hidden')) {
+          playTitlePlaylistIndex((titlePlaylistIdx + 1) % TITLE_PLAYLIST.length);
+        }
       }, TITLE_INTRO_REPLAY_MS);
     }
     function showTitlePicture() {
@@ -436,7 +440,11 @@
       const p = iv.play();
       if (p && typeof p.catch === 'function') p.catch(() => showTitlePicture());
     }
-    function playTitleIntro() { playTitleVideo(TITLE_INTRO_SRC); }
+    function playTitlePlaylistIndex(i) {
+      titlePlaylistIdx = i;
+      playTitleVideo(TITLE_PLAYLIST[i]);
+    }
+    function playTitleIntro() { playTitlePlaylistIndex(0); }
     function hideTitleIntro() {
       clearTitleIntroTimer();
       introVideoPlaying = false;
