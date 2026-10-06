@@ -2360,4 +2360,9 @@
     justify-self: end;
     text-align: right;
   }
+  /* Both bottom cells stay on one line, sharing the same baseline. */
+  #logo-header-box .status-bar:not(.boxed) > div:first-child,
+  #logo-header-box .status-bar:not(.boxed) #total-treasury-display {
+    white-space: nowrap;
+  }
 }
