@@ -31,7 +31,7 @@
   <meta property="og:url" content="https://eagle3440.github.io/scripture-pursuit/" />
   <meta property="og:type" content="website" />
 
-  <link rel="stylesheet" href="styles.css?v=25">
+  <link rel="stylesheet" href="styles.css?v=27">
   <script src="https://cdn.jsdelivr.net/npm/gameanalytics@4.0.0/umd/gameanalytics.min.js"></script>
 </head>
 <body>
@@ -412,11 +412,54 @@
     const TITLE_INTRO_REPLAY_MS = 5 * 60 * 1000;
     const TITLE_COUNTDOWN_STEPS = ['3', '2', '1'];
     const TITLE_COUNTDOWN_STEP_MS = 1000;
+    const TITLE_WARNING_LEAD_MS = 3000; // warning shows this long before the countdown
     let titleIntroTimer = null;
     let titleCountdownInt = null;
+    let titleWarningTimer = null;
     let titlePlaylistIdx = 0;
+    // Set true once the welcome LED ticker is running (see startWelcomeLedTicker).
+    // Guards the launch-warning hooks so the page-load autoplay (which runs
+    // before the ticker exists) never touches ticker state.
+    let titleTickerReady = false;
     function clearTitleIntroTimer() {
       if (titleIntroTimer) { clearTimeout(titleIntroTimer); titleIntroTimer = null; }
+    }
+    function clearTitleWarningTimer() {
+      if (titleWarningTimer) { clearTimeout(titleWarningTimer); titleWarningTimer = null; }
+    }
+    // Cut the weather music while a title video (and its warning) is happening.
+    // Direct DOM access on purpose: safe to call even before the ticker exists.
+    function cutTitleWeatherMusic() {
+      try {
+        const wm = document.getElementById('weather-music-audio');
+        if (wm && !wm.paused) wm.pause();
+      } catch (e) {}
+    }
+    // Ticker line-1 launch warning. Defined here, but only touches ticker
+    // state once titleTickerReady is true (after startWelcomeLedTicker).
+    // The warning appears centered and static (no scroll-in), fades in and
+    // pulses like a warning beacon, and plays a single warning alarm.
+    let titleRestoreTimer = null;
+    function showTitleLaunchWarning() {
+      if (!titleTickerReady) return;
+      if (titleRestoreTimer) { clearTimeout(titleRestoreTimer); titleRestoreTimer = null; }
+      const msg = document.getElementById('led-ticker-msg');
+      if (msg) { msg.classList.remove('warn-out'); msg.classList.add('warn'); }
+      ledTickerLine1.start(LED_TICKER_LAUNCH_STEPS, { loop: true });
+      playSound('photo-finish');
+    }
+    function restoreTickerLine1() {
+      if (titleRestoreTimer) { clearTimeout(titleRestoreTimer); titleRestoreTimer = null; }
+      const msg = document.getElementById('led-ticker-msg');
+      if (msg) { msg.classList.remove('warn'); msg.classList.add('warn-out'); }
+      // Fade the warning out first, then hand line 1 back to the welcome loop.
+      titleRestoreTimer = setTimeout(() => {
+        titleRestoreTimer = null;
+        const m = document.getElementById('led-ticker-msg');
+        if (m) m.classList.remove('warn-out');
+        if (!titleTickerReady) return; // game started meanwhile — stay stopped
+        ledTickerLine1.start(LED_TICKER_LINE1_STEPS, { loop: true });
+      }, 650);
     }
     function hideTitleCountdown() {
       if (titleCountdownInt) { clearInterval(titleCountdownInt); titleCountdownInt = null; }
@@ -466,6 +509,7 @@
       introVideoPlaying = false;
       const iv = document.getElementById('title-intro-video');
       if (iv) { iv.pause(); iv.classList.add('hidden'); }
+      restoreTickerLine1();
       scheduleTitleIntroReplay();
     }
     function playTitleVideo(src) {
@@ -482,13 +526,28 @@
     function playTitlePlaylistIndex(i, withCountdown) {
       titlePlaylistIdx = i;
       hideTitleCountdown(); // a new play cancels any running countdown
-      if (withCountdown) runTitleCountdown(() => playTitleVideo(TITLE_PLAYLIST[i]));
-      else playTitleVideo(TITLE_PLAYLIST[i]);
+      clearTitleWarningTimer();
+      if (withCountdown) {
+        // Warning first, then the 3-2-1, then the video.
+        showTitleLaunchWarning();
+        cutTitleWeatherMusic();
+        titleWarningTimer = setTimeout(() => {
+          titleWarningTimer = null;
+          if (document.getElementById('start-game-btn').classList.contains('hidden')) return;
+          runTitleCountdown(() => playTitleVideo(TITLE_PLAYLIST[i]));
+        }, TITLE_WARNING_LEAD_MS);
+      } else {
+        showTitleLaunchWarning();
+        cutTitleWeatherMusic();
+        playTitleVideo(TITLE_PLAYLIST[i]);
+      }
     }
     function playTitleIntro() { playTitlePlaylistIndex(0, false); }
     function hideTitleIntro() {
       clearTitleIntroTimer();
+      clearTitleWarningTimer();
       hideTitleCountdown();
+      restoreTickerLine1();
       introVideoPlaying = false;
       const iv = document.getElementById('title-intro-video');
       const rb = document.getElementById('title-intro-replay');
@@ -1551,6 +1610,21 @@
     // Line 1 (top, normal speed): welcome / promo / sponsor sequence — ends holding "Welcome" centered.
     // Each step: getText() (optional; if it returns falsy, the step is skipped),
     // from/to (px offsets computed from viewport width and message width), duration (seconds).
+    // Launch warning (2026-10-06): shown on ticker line 1 each time a title
+    // video launches — amber, centered and static (from == to, so no scroll),
+    // fading in and pulsing like a warning beacon until the video ends.
+    // Phone gets a shorter text for the narrow ticker.
+    const LED_LAUNCH_WARNING = "⚠ WARNING: BULLET LINE DEPARTING ON ANOTHER ADVENTURE ⚠";
+    const LED_LAUNCH_WARNING_SHORT = "BULLET LINE DEPARTING";
+    const LED_TICKER_LAUNCH_STEPS = [
+      {
+        getText: () => (isPhoneWidth() ? LED_LAUNCH_WARNING_SHORT : LED_LAUNCH_WARNING),
+        from: (vw, w) => (vw - w) / 2,
+        to: (vw, w) => (vw - w) / 2,
+        duration: (vw, w) => 120
+      }
+    ];
+
     const LED_TICKER_LINE1_STEPS = [
       { getText: () => LED_MSG_1, from: (vw, w) => (vw - w) / 2, to: (vw, w) => (vw - w) / 2, duration: () => 15 },
       { from: (vw, w) => (vw - w) / 2, to: (vw, w) => -w, duration: () => 3.5 },
@@ -1810,12 +1884,17 @@
       qDisplay.classList.add('hidden');
       ledTickerEl.classList.remove('hidden');
       welcomeTickerActive = true;
+      titleTickerReady = true;
+      if (titleRestoreTimer) { clearTimeout(titleRestoreTimer); titleRestoreTimer = null; }
+      const lm = document.getElementById('led-ticker-msg');
+      if (lm) lm.classList.remove('warn', 'warn-out');
       ledTickerLine1.start(LED_TICKER_LINE1_STEPS, { loop: true });
       ledTickerLine2.start(buildLine2Steps(), { loop: true, regenerate: buildLine2Steps });
     }
 
     function stopWelcomeLedTicker() {
       welcomeTickerActive = false;
+      titleTickerReady = false;
       ledTickerLine1.stop();
       ledTickerLine2.stop();
       stopWeatherMusic();
