@@ -15,7 +15,7 @@
 * **Learning Library:** Every question you miss is saved as a KJV verse flashcard. Review them from the summary screen -- tap to flip, mark MASTERED to remove, and resize the verse text with the -/+ buttons.
 * **The Ticket Store:** Spend your lifetime Total Treasury on five themed question packs -- each unlocking hundreds of additional KJV questions and a matching category-only way to play. See below for details.
 * **Procedural Web Audio API Sound Effects:** Sound effects and train ambient audio generated programmatically via JavaScript -- no audio assets required for gameplay. The title-screen weather music is embedded in the page.
-* **The Jerusalem Herald News Ticker:** A two-line LED marquee on the title screen delivers scrolling local weather and a rotating feed of KJV-inspired "breaking news" headlines -- see below for details.
+* **The Jerusalem Herald News Ticker:** A two-line LED marquee on the title screen delivers scrolling live weather from the Holy Land and a rotating feed of KJV-inspired "breaking news" headlines -- see below for details.
 * **Title Videos:** Three cinematic clips play over the title-train picture on a five-minute rotation -- `title-intro.mp4` on page load, then `time-tunnel.mp4`, then `jerusalem-entry.mp4`, looping. A 3-2-1 countdown (desktop only) precedes each automatic video, and the ↻ button replays the intro anytime. See below for details.
 * **Responsive & Immersive UI:** Features a custom neon train CSS layout, animated fog background, mobile-optimized scripture viewing drawers, and dynamic game statistics tracking.
 
@@ -199,7 +199,7 @@ The game uses a **smart deck shuffling system** to ensure a fresh experience whi
 The title screen features a two-line scrolling LED ticker themed as a fictional news network, "The Jerusalem Herald":
 
 * **Line 1** cycles through welcome and promotional messages.
-* **Line 2** alternates between a local weather readout ("YOUR LOCAL WEATHER IN THE HOLY LAND") and batches of KJV-inspired news headlines, each labeled with the "JERUSALEM HERALD" masthead (styled gold) and a status tag (styled red -- normally "BREAKING NEWS," see below).
+* **Line 2** alternates between a live Holy Land weather readout ("YOUR LOCAL WEATHER IN THE HOLY LAND" -- real current conditions fetched from a weather API for Jerusalem, Bethlehem, Nazareth, the Sea of Galilee, and other biblical locations) and batches of KJV-inspired news headlines, each labeled with the "JERUSALEM HERALD" masthead (styled gold) and a status tag (styled red -- normally "BREAKING NEWS," see below).
 
 **Randomized playback:** Every time Line 2 finishes a pass -- including each time it loops -- the news headlines are freshly shuffled into a new random order, and are broken into randomly-sized batches of 1 to 5 stories between each weather segment (rather than a fixed count), so the sequence and grouping is different every time.
 
