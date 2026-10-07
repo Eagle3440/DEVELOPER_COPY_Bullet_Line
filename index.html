@@ -404,12 +404,12 @@
     // the webp box by CSS, layered above the picture but below the treasury
     // status bar. When a video ends (or fails), the webp underneath comes back.
     // While the title screen is showing, the videos rotate on their own every
-    // 5 minutes: intro -> time-tunnel -> jerusalem-entry -> intro ...
+    // 2 minutes: intro -> time-tunnel -> jerusalem-entry -> intro ...
     // A 3-2-1 countdown shows bottom-left of the picture before each automatic
     // video (desktop only; the page-load intro plays immediately).
     // The replay button replays the intro (restarts the rotation).
     const TITLE_PLAYLIST = ['title-intro.mp4', 'time-tunnel.mp4', 'jerusalem-entry.mp4'];
-    const TITLE_INTRO_REPLAY_MS = 5 * 60 * 1000;
+    const TITLE_INTRO_REPLAY_MS = 2 * 60 * 1000;
     const TITLE_COUNTDOWN_STEPS = ['3', '2', '1'];
     const TITLE_COUNTDOWN_STEP_MS = 1000;
     const TITLE_WARNING_LEAD_MS = 3000; // warning shows this long before the countdown
