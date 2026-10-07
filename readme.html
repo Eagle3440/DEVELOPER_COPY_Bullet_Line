@@ -172,16 +172,17 @@
       <ol>
         <li><a href="#s1"><span class="n">&#128640;</span><span class="t">Core Features</span></a></li>
         <li><a href="#s2"><span class="n">&#127918;</span><span class="t">How to Play</span></a></li>
-        <li><a href="#s3"><span class="n">&#128176;</span><span class="t">Treasury Management System</span></a></li>
-        <li><a href="#s4"><span class="n">&#127903;</span><span class="t">The Ticket Store</span></a></li>
-        <li><a href="#s5"><span class="n">&#128202;</span><span class="t">Game Summary Report</span></a></li>
-        <li><a href="#s6"><span class="n">&#128218;</span><span class="t">Learning Library</span></a></li>
-        <li><a href="#s7"><span class="n">&#9888;&#65039;</span><span class="t">Hazard Events</span></a></li>
-        <li><a href="#s8"><span class="n">&#128260;</span><span class="t">Question Deck Shuffle Logic</span></a></li>
-        <li><a href="#s9"><span class="n">&#128240;</span><span class="t">The Jerusalem Herald News Ticker</span></a></li>
-        <li><a href="#s10"><span class="n">&#128172;</span><span class="t">Feedback</span></a></li>
-        <li><a href="#s11"><span class="n">&#128193;</span><span class="t">Project Structure</span></a></li>
-        <li><a href="#s12"><span class="n">&#128220;</span><span class="t">License</span></a></li>
+        <li><a href="#s3"><span class="n">&#127916;</span><span class="t">Title Videos</span></a></li>
+        <li><a href="#s4"><span class="n">&#128176;</span><span class="t">Treasury Management System</span></a></li>
+        <li><a href="#s5"><span class="n">&#127903;</span><span class="t">The Ticket Store</span></a></li>
+        <li><a href="#s6"><span class="n">&#128202;</span><span class="t">Game Summary Report</span></a></li>
+        <li><a href="#s7"><span class="n">&#128218;</span><span class="t">Learning Library</span></a></li>
+        <li><a href="#s8"><span class="n">&#9888;&#65039;</span><span class="t">Hazard Events</span></a></li>
+        <li><a href="#s9"><span class="n">&#128260;</span><span class="t">Question Deck Shuffle Logic</span></a></li>
+        <li><a href="#s10"><span class="n">&#128240;</span><span class="t">The Jerusalem Herald News Ticker</span></a></li>
+        <li><a href="#s11"><span class="n">&#128172;</span><span class="t">Feedback</span></a></li>
+        <li><a href="#s12"><span class="n">&#128193;</span><span class="t">Project Structure</span></a></li>
+        <li><a href="#s13"><span class="n">&#128220;</span><span class="t">License</span></a></li>
       </ol>
     </nav>
 
@@ -199,6 +200,7 @@
           <li><strong>The Ticket Store:</strong> Spend your lifetime Total Treasury on five themed question packs -- each unlocking hundreds of additional KJV questions and a matching category-only way to play. See below for details.</li>
           <li><strong>Procedural Web Audio API Sound Effects:</strong> Sound effects and train ambient audio generated programmatically via JavaScript -- no audio assets required for gameplay. The title-screen weather music is embedded in the page.</li>
           <li><strong>The Jerusalem Herald News Ticker:</strong> A two-line LED marquee on the title screen delivers scrolling local weather and a rotating feed of KJV-inspired "breaking news" headlines -- see below for details.</li>
+          <li><strong>Title Videos:</strong> Three cinematic clips play over the title-train picture on a five-minute rotation -- <code>title-intro.mp4</code> on page load, then <code>time-tunnel.mp4</code>, then <code>jerusalem-entry.mp4</code>, looping. A 3-2-1 countdown (desktop only) precedes each automatic video, and the &#8635; button replays the intro anytime. See below for details.</li>
           <li><strong>Responsive &amp; Immersive UI:</strong> Features a custom neon train CSS layout, animated fog background, mobile-optimized scripture viewing drawers, and dynamic game statistics tracking.</li>
         </ul>
       </section>
@@ -222,7 +224,26 @@
         </ol>
         <p>If you've bought one or more question packs from the Ticket Store (see below), the title screen also offers a <strong>category-only play</strong> option, drawing questions solely from that pack's books of the Bible instead of the full mixed deck.</p>
       </section>
+
       <section id="s3">
+        <h2><span class="e">&#127916;</span>Title Videos</h2>
+        <p>Three cinematic clips play over the title-train picture on the title screen:</p>
+        <ul>
+          <li><code>title-intro.mp4</code> -- Plays automatically on page load.</li>
+          <li><code>time-tunnel.mp4</code> -- A train ride through a time vortex.</li>
+          <li><code>jerusalem-entry.mp4</code> -- A lightning train arriving over the city.</li>
+        </ul>
+        <p>They run on a rotation: the intro plays on load, then the title picture returns; five minutes later <code>time-tunnel.mp4</code> plays, five minutes after that <code>jerusalem-entry.mp4</code> plays, then the loop starts over from the intro. The rotation runs the same on phone and desktop.</p>
+        <ul>
+          <li>The videos fill the title picture exactly, playing above it but below the treasury HUD, so your Shekels stay visible.</li>
+          <li>Video sound follows the sound switch -- the clips stay muted until you turn sound on.</li>
+          <li>Before each automatic video (except the first page-load intro), a <strong>3-2-1 countdown</strong> appears in a small circle in the bottom-left corner of the picture -- desktop only, since the phone's bottom-left corner holds the TREASURY marker.</li>
+          <li>The <strong>&#8635; replay button</strong> (bottom-right of the picture on desktop, top-right on phone) replays the intro at any time, which also restarts the rotation from the beginning.</li>
+          <li>Starting a game stops the rotation; returning to the title screen restarts the five-minute countdown.</li>
+          <li>Deployment note: all three <code>.mp4</code> files must sit in the same folder as <code>index.html</code>. If one is missing, the rotation skips it and moves on to the next.</li>
+        </ul>
+      </section>
+      <section id="s4">
         <h2><span class="e">&#128176;</span>Treasury Management System</h2>
         <p>The game tracks your biblical wealth across three distinct metrics:</p>
         <p><strong>Starting over:</strong> If you clear your browser's data (or localStorage) for this site, everything resets -- treasuries, owned ticket packs, rivalry records, Learning Library cards -- as if you'd never played. There is no account and no backup, so cleared data cannot be recovered.</p>
@@ -274,7 +295,7 @@ Page reload/new browser session:
   - TOTAL TREASURY: Still 21,000 Shekels (persists, does not reset)</pre>
       </section>
 
-      <section id="s4">
+      <section id="s5">
         <h2><span class="e">&#127903;</span>The Ticket Store</h2>
         <p><code>store.html</code> is a standalone page, styled to match the main game, where you spend your <strong>TOTAL TREASURY</strong> on five themed "Bullet Train Ticket" question packs. It shares the <code>totalTreasuryAccount</code> localStorage balance directly with the game -- so Shekels you've banked from winning games are exactly what you spend here, and the balance updates live in both places.</p>
         <table>
@@ -295,7 +316,7 @@ Page reload/new browser session:
         </ul>
       </section>
 
-      <section id="s5">
+      <section id="s6">
         <h2><span class="e">&#128202;</span>Game Summary Report</h2>
         <p>After each game concludes (win or loss), a detailed <strong>Game Summary Report</strong> is displayed showing:</p>
         <ul>
@@ -325,7 +346,7 @@ Page reload/new browser session:
         <p>This report helps reinforce biblical knowledge, track your progress over multiple play sessions, see how close you came to beating your personal high score, and generate a printable record of your gameplay.</p>
       </section>
 
-      <section id="s6">
+      <section id="s7">
         <h2><span class="e">&#128218;</span>Learning Library</h2>
         <p>Every question you miss -- in the Shekel Builder, the race, or sudden death -- is saved as a KJV verse flashcard in your <strong>Learning Library</strong> (stored in localStorage as <code>bulletline_learning_library</code>, one card per verse, deduplicated by reference). The cards say nothing about the game, your wrong answer, or the right one -- just the verse.</p>
         <ul>
@@ -336,7 +357,7 @@ Page reload/new browser session:
           <li><strong>Honor system:</strong> There is no quiz or test mode -- review is on your conscience.</li>
         </ul>
       </section>
-      <section id="s7">
+      <section id="s8">
         <h2><span class="e">&#9888;&#65039;</span>Hazard Events</h2>
         <p>The race isn't just you versus Train X -- the track itself fights back. A 14-card hazard deck (Bridge Out, the Red Sea, Jonah's Storm, Jericho Walls, Daniel's Lions, the Fiery Furnace, Elijah's Whirlwind, Locust Swarm, Earth Quakes, Jordan Overflows, Hornets, Frogs, Thunder on Mount Sinai, Earth Opens) is shuffled once per session with no repeats until every card has been seen.</p>
         <ul>
@@ -347,7 +368,7 @@ Page reload/new browser session:
         </ul>
       </section>
 
-      <section id="s8">
+      <section id="s9">
         <h2><span class="e">&#128260;</span>Question Deck Shuffle Logic</h2>
         <p>The game uses a <strong>smart deck shuffling system</strong> to ensure a fresh experience while preventing question fatigue:</p>
         <ul>
@@ -359,7 +380,7 @@ Page reload/new browser session:
         </ul>
       </section>
 
-      <section id="s9">
+      <section id="s10">
         <h2><span class="e">&#128240;</span>The Jerusalem Herald News Ticker</h2>
         <p>The title screen features a two-line scrolling LED ticker themed as a fictional news network, "The Jerusalem Herald":</p>
         <ul>
@@ -374,12 +395,12 @@ Page reload/new browser session:
         </ul>
       </section>
 
-      <section id="s10">
+      <section id="s11">
         <h2><span class="e">&#128172;</span>Feedback</h2>
         <p>A <strong>FEEDBACK</strong> link in the top navigation opens an in-page form for sending questions, comments, or suggestions about the game directly to the developer's email.</p>
       </section>
 
-      <section id="s11">
+      <section id="s12">
         <h2><span class="e">&#128193;</span>Project Structure</h2>
         <p>The project is organized into a handful of files rather than a single monolithic one, separating the question data and styling from the application logic:</p>
         <ul>
@@ -388,12 +409,13 @@ Page reload/new browser session:
           <li><code>questions.json</code> -- The KJV question bank (100 free questions plus 901 across the five Ticket Store packs -- 1,001 total), including scripture references, quotes, and answer choices.</li>
           <li><code>store.html</code> -- The standalone Ticket Store page described above, sharing the game's branding, fog background, and visual style.</li>
           <li><code>logo.png</code> -- The game's logo image.</li>
+          <li><code>title-intro.mp4</code>, <code>time-tunnel.mp4</code>, <code>jerusalem-entry.mp4</code> -- The three title-screen videos (see Title Videos above). They must sit next to <code>index.html</code>.</li>
           <li><code>LICENSE</code> -- Project license terms (plain text).</li>
           <li><code>license.html</code> -- The same license terms as a styled web page.</li>
         </ul>
       </section>
 
-      <section id="s12">
+      <section id="s13">
         <h2><span class="e">&#128220;</span>License</h2>
         <p>(c) 2026 William Monti. All rights reserved.</p>
         <p>This game is proprietary software. See the LICENSE file for the full terms: no copying, modifying, distributing, or selling any part of the game without written permission.</p>

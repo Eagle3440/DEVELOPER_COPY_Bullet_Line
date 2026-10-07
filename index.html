@@ -31,7 +31,7 @@
   <meta property="og:url" content="https://eagle3440.github.io/scripture-pursuit/" />
   <meta property="og:type" content="website" />
 
-  <link rel="stylesheet" href="styles.css?v=24">
+  <link rel="stylesheet" href="styles.css?v=25">
   <script src="https://cdn.jsdelivr.net/npm/gameanalytics@4.0.0/umd/gameanalytics.min.js"></script>
 </head>
 <body>
@@ -129,6 +129,7 @@
         <img id="title-train-img" src="title-train.webp" alt="The Bullet Line" class="train-title-image">
         <video id="title-intro-video" class="title-intro-video" src="title-intro.mp4" muted playsinline preload="auto" aria-label="Title intro video"></video>
         <button id="title-intro-replay" class="title-intro-replay" type="button" aria-label="Replay intro video" title="Replay intro video">&#8635;</button>
+        <div id="title-countdown" class="title-countdown hidden" aria-hidden="true">3</div>
         <div class="status-bar">
           <div>TREASURY: <span id="bank-val" class="bank-text">0 Shekels</span><span id="combo-val" class="combo-text"></span></div>
           <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;">
@@ -404,13 +405,49 @@
     // status bar. When a video ends (or fails), the webp underneath comes back.
     // While the title screen is showing, the videos rotate on their own every
     // 5 minutes: intro -> time-tunnel -> jerusalem-entry -> intro ...
+    // A 3-2-1 countdown shows bottom-left of the picture before each automatic
+    // video (desktop only; the page-load intro plays immediately).
     // The replay button replays the intro (restarts the rotation).
     const TITLE_PLAYLIST = ['title-intro.mp4', 'time-tunnel.mp4', 'jerusalem-entry.mp4'];
     const TITLE_INTRO_REPLAY_MS = 5 * 60 * 1000;
+    const TITLE_COUNTDOWN_STEPS = ['3', '2', '1'];
+    const TITLE_COUNTDOWN_STEP_MS = 1000;
     let titleIntroTimer = null;
+    let titleCountdownInt = null;
     let titlePlaylistIdx = 0;
     function clearTitleIntroTimer() {
       if (titleIntroTimer) { clearTimeout(titleIntroTimer); titleIntroTimer = null; }
+    }
+    function hideTitleCountdown() {
+      if (titleCountdownInt) { clearInterval(titleCountdownInt); titleCountdownInt = null; }
+      const cd = document.getElementById('title-countdown');
+      if (cd) cd.classList.add('hidden');
+    }
+    function isPhoneWidth() {
+      return window.matchMedia('(max-width: 767px)').matches;
+    }
+    // 3-2-1 on the title picture before an automatic rotation video (desktop
+    // only — phone plays immediately). done() fires after the "1" clears.
+    function runTitleCountdown(done) {
+      const cd = document.getElementById('title-countdown');
+      if (!cd || isPhoneWidth()) { done(); return; }
+      let s = 0;
+      cd.textContent = TITLE_COUNTDOWN_STEPS[s];
+      cd.classList.remove('hidden');
+      titleCountdownInt = setInterval(() => {
+        // Game started mid-countdown: bail out, never play over a game.
+        if (document.getElementById('start-game-btn').classList.contains('hidden')) {
+          hideTitleCountdown();
+          return;
+        }
+        s++;
+        if (s >= TITLE_COUNTDOWN_STEPS.length) {
+          hideTitleCountdown();
+          done();
+        } else {
+          cd.textContent = TITLE_COUNTDOWN_STEPS[s];
+        }
+      }, TITLE_COUNTDOWN_STEP_MS);
     }
     function scheduleTitleIntroReplay() {
       clearTitleIntroTimer();
@@ -419,7 +456,7 @@
         // Backstop: a game start clears the timer via hideTitleIntro, so this
         // should only fire on the title screen — but never replay mid-game.
         if (!document.getElementById('start-game-btn').classList.contains('hidden')) {
-          playTitlePlaylistIndex((titlePlaylistIdx + 1) % TITLE_PLAYLIST.length);
+          playTitlePlaylistIndex((titlePlaylistIdx + 1) % TITLE_PLAYLIST.length, true);
         }
       }, TITLE_INTRO_REPLAY_MS);
     }
@@ -440,13 +477,16 @@
       const p = iv.play();
       if (p && typeof p.catch === 'function') p.catch(() => showTitlePicture());
     }
-    function playTitlePlaylistIndex(i) {
+    function playTitlePlaylistIndex(i, withCountdown) {
       titlePlaylistIdx = i;
-      playTitleVideo(TITLE_PLAYLIST[i]);
+      hideTitleCountdown(); // a new play cancels any running countdown
+      if (withCountdown) runTitleCountdown(() => playTitleVideo(TITLE_PLAYLIST[i]));
+      else playTitleVideo(TITLE_PLAYLIST[i]);
     }
-    function playTitleIntro() { playTitlePlaylistIndex(0); }
+    function playTitleIntro() { playTitlePlaylistIndex(0, false); }
     function hideTitleIntro() {
       clearTitleIntroTimer();
+      hideTitleCountdown();
       introVideoPlaying = false;
       const iv = document.getElementById('title-intro-video');
       const rb = document.getElementById('title-intro-replay');

@@ -261,6 +261,32 @@
       box-shadow: 0 0 18px rgba(0, 210, 255, 0.4);
     }
 
+    /* 3-2-1 countdown before each automatic rotation video (2026-10-06):
+       bottom-left of the title picture, desktop only. Same 34px circle
+       as the restart button. */
+    .title-countdown {
+      position: absolute;
+      left: 8px;
+      bottom: 8px;
+      z-index: 4;
+      width: 34px;
+      height: 34px;
+      border-radius: 9999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Montserrat', 'Segoe UI', sans-serif;
+      font-size: 18px;
+      font-weight: 900;
+      line-height: 1;
+      color: #00d2ff;
+      text-shadow: 0 0 8px rgba(0, 210, 255, 0.6);
+      background: rgba(10, 20, 36, 0.55);
+      border: 1px solid rgba(0, 210, 255, 0.55);
+      box-shadow: 0 0 10px rgba(0, 210, 255, 0.18);
+      pointer-events: none;
+    }
+
     .train-logo-wrapper.run-chase {
       animation: trainArrival 2.5s ease-out forwards;
     }
@@ -2463,6 +2489,12 @@
   .title-intro-replay {
     top: 8px;
     bottom: auto;
+  }
+
+  /* --- Title countdown (2026-10-06): desktop only — the bottom-left
+         corner holds the TREASURY marker on phone, so no countdown here. --- */
+  .title-countdown {
+    display: none !important;
   }
 
 }
