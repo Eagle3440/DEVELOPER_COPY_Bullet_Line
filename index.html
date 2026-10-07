@@ -434,6 +434,7 @@
       let s = 0;
       cd.textContent = TITLE_COUNTDOWN_STEPS[s];
       cd.classList.remove('hidden');
+      playSound('countdown-tick'); // beep on "3", same as the race verse countdown
       titleCountdownInt = setInterval(() => {
         // Game started mid-countdown: bail out, never play over a game.
         if (document.getElementById('start-game-btn').classList.contains('hidden')) {
@@ -446,6 +447,7 @@
           done();
         } else {
           cd.textContent = TITLE_COUNTDOWN_STEPS[s];
+          playSound('countdown-tick'); // beep on "2" and "1"
         }
       }, TITLE_COUNTDOWN_STEP_MS);
     }
