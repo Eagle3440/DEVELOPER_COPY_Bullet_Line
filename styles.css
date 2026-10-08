@@ -114,6 +114,11 @@
       color: #ffffff;
     }
 
+    #disclaimer-footer .footer-copy {
+      font-size: 0.75rem;
+      color: #8da4c4;
+    }
+
     /* Moving glow around BUY TICKET when the player can afford the next
        ticket. A bright cyan "comet" traces the actual outline of the button
        and visibly travels clockwise around it (via SVG stroke-dashoffset,
@@ -2416,11 +2421,12 @@
   }
 
   /* --- Footer links: all five on one line on phones (2026-10-07) ---
-         Measured with Montserrat Bold: ~310px total at these sizes,
+         Measured with Montserrat Bold: ~320px total at these sizes,
          fits 360px+ phones. --- */
-  #disclaimer-footer { font-size: 0.55rem; }
-  #disclaimer-footer .footer-row { flex-wrap: nowrap; gap: 6px; letter-spacing: 0.2px; }
-  #disclaimer-footer a { padding: 2px 5px; white-space: nowrap; }
+  #disclaimer-footer { font-size: 0.58rem; }
+  #disclaimer-footer .footer-row { flex-wrap: nowrap; gap: 5px; letter-spacing: 0.1px; }
+  #disclaimer-footer a { padding: 2px 3px; white-space: nowrap; }
+  #disclaimer-footer .footer-copy { font-size: 0.58rem; }
 
   /* --- Title-screen treasury layout (2026-10-05): HIGH SCORE centered at
          the top of the train picture, TREASURY bottom-left, TOTAL TREASURY
