@@ -409,6 +409,23 @@
     // video (desktop only; the page-load intro plays immediately).
     // The replay button replays the intro (restarts the rotation).
     const TITLE_PLAYLIST = ['title-intro.mp4', 'time-tunnel.mp4', 'sea-of-galilee.mp4', 'jerusalem-entry.mp4', 'pool-of-bethesda.mp4', 'bethany.mp4'];
+    // Destination names for the ticker launch warning — the alert names where
+    // the bullet train is headed. Phone shows the shortened destination only
+    // (his call — the full line would clip on the narrow phone ticker).
+    const TITLE_DESTINATIONS = {
+      'title-intro.mp4':      { full: 'ANOTHER ADVENTURE',    short: 'ANOTHER ADVENTURE' },
+      'time-tunnel.mp4':      { full: 'THE TIME TUNNEL',      short: 'TIME TUNNEL' },
+      'sea-of-galilee.mp4':   { full: 'THE SEA OF GALILEE',   short: 'SEA OF GALILEE' },
+      'jerusalem-entry.mp4':  { full: 'JERUSALEM',            short: 'JERUSALEM' },
+      'pool-of-bethesda.mp4': { full: 'THE POOL OF BETHESDA', short: 'POOL OF BETHESDA' },
+      'bethany.mp4':          { full: 'BETHANY',              short: 'BETHANY' }
+    };
+    // Builds the launch-warning text for the upcoming video — titlePlaylistIdx
+    // is already pointing at it when the warning shows.
+    function getTitleLaunchWarningText() {
+      const d = TITLE_DESTINATIONS[TITLE_PLAYLIST[titlePlaylistIdx]] || TITLE_DESTINATIONS['title-intro.mp4'];
+      return isPhoneWidth() ? d.short : `⚠ WARNING: BULLET LINE DEPARTING FOR ${d.full} ⚠`;
+    }
     const TITLE_INTRO_REPLAY_MS = 2 * 60 * 1000;
     const TITLE_COUNTDOWN_STEPS = ['3', '2', '1'];
     const TITLE_COUNTDOWN_STEP_MS = 1000;
@@ -1614,12 +1631,12 @@
     // Launch warning (2026-10-06): shown on ticker line 1 each time a title
     // video launches — amber, centered and static (from == to, so no scroll),
     // fading in and pulsing like a warning beacon until the video ends.
-    // Phone gets a shorter text for the narrow ticker.
-    const LED_LAUNCH_WARNING = "⚠ WARNING: BULLET LINE DEPARTING ON ANOTHER ADVENTURE ⚠";
-    const LED_LAUNCH_WARNING_SHORT = "BULLET LINE DEPARTING";
+    // 2026-10-08: the warning names the train's destination
+    // (getTitleLaunchWarningText); phone shows the shortened destination only
+    // for the narrow ticker.
     const LED_TICKER_LAUNCH_STEPS = [
       {
-        getText: () => (isPhoneWidth() ? LED_LAUNCH_WARNING_SHORT : LED_LAUNCH_WARNING),
+        getText: () => getTitleLaunchWarningText(),
         from: (vw, w) => (vw - w) / 2,
         to: (vw, w) => (vw - w) / 2,
         duration: (vw, w) => 120
