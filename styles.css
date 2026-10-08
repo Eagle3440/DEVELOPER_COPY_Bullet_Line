@@ -2420,9 +2420,21 @@
     background: rgba(4, 10, 20, 0.98);
   }
 
-  /* --- Phone footer (2026-10-07): regular size, wraps to two centered
-         lines. The 0.58rem one-line experiment looked bad on his Android;
-         desktop styling applies as-is. --- */
+  /* --- Phone footer: two boxed rows (2026-10-07, his call). Row 1 =
+         HOW TO PLAY + BUY TICKET, row 2 = FEEDBACK + TERMS + LICENSE,
+         both centered, original boxed style. Desktop unchanged. --- */
+  #disclaimer-footer .footer-row:first-child::after {
+    content: "";
+    flex-basis: 100%;
+    height: 0;
+    order: 3;
+    margin: -8px 0;
+  }
+  #disclaimer-footer .footer-row:first-child > a:first-child { order: 1; }          /* HOW TO PLAY */
+  #disclaimer-footer .footer-row:first-child > span.buy-ticket-wrap { order: 2; }  /* BUY TICKET */
+  #disclaimer-footer .footer-row:first-child > a#feedback-link { order: 4; }        /* FEEDBACK */
+  #disclaimer-footer .footer-row:first-child > a[href="terms.html"] { order: 5; }  /* TERMS */
+  #disclaimer-footer .footer-row:first-child > a[href="license.html"] { order: 6; } /* LICENSE */
 
   /* --- Title-screen treasury layout (2026-10-05): HIGH SCORE centered at
          the top of the train picture, TREASURY bottom-left, TOTAL TREASURY
