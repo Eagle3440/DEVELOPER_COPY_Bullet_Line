@@ -60,13 +60,6 @@
   box-shadow: 0 0 14px rgba(0, 191, 255, 0.3);
 }
 </style>
-<style>
-/* Desktop (>=1024px, 3-col grid) keeps the original fixed-290px ticket look.
-   The proportional perforation anchoring applies only below 1024px. */
-@media (min-width:1024px){
-  .ticket-art{height:290px!important;aspect-ratio:auto!important;}
-}
-</style>
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-0NYTRH8V3D"></script>
   <script>
@@ -779,7 +772,7 @@ function packCard(p) {
       <div class="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100" style="background:radial-gradient(600px circle at 50% 0%, ${p.accentSoft} 0%, transparent 60%)"></div>
 
       <div class="relative">
-      <div class="ticket-art relative overflow-hidden p-[1px]" style="aspect-ratio:340/290;max-height:290px">
+      <div class="relative overflow-hidden p-[1px]" style="height:290px">
         <div class="absolute inset-0" style="background:linear-gradient(135deg, ${p.accent}18, transparent 60%), linear-gradient(180deg, #132238, #0a1424)"></div>
         <div class="absolute left-0 top-0 h-[2px] w-full" style="background:linear-gradient(90deg, ${p.accent}, transparent)"></div>
         <div class="absolute -right-8 -top-8 h-32 w-32 rounded-full blur-[18px] opacity-40" style="background:${p.accent}"></div>
