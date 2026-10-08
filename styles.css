@@ -2415,6 +2415,13 @@
     background: rgba(4, 10, 20, 0.98);
   }
 
+  /* --- Footer links: all five on one line on phones (2026-10-07) ---
+         Measured with Montserrat Bold: ~310px total at these sizes,
+         fits 360px+ phones. --- */
+  #disclaimer-footer { font-size: 0.55rem; }
+  #disclaimer-footer .footer-row { flex-wrap: nowrap; gap: 6px; letter-spacing: 0.2px; }
+  #disclaimer-footer a { padding: 2px 5px; white-space: nowrap; }
+
   /* --- Title-screen treasury layout (2026-10-05): HIGH SCORE centered at
          the top of the train picture, TREASURY bottom-left, TOTAL TREASURY
          bottom-right — the train stays uncovered. Title only (:not(.boxed));
