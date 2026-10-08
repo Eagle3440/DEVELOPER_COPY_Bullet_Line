@@ -2428,7 +2428,7 @@
     flex-basis: 100%;
     height: 0;
     order: 3;
-    margin: -8px 0;
+    margin: -12px 0; /* net 8px row gap: row 2 sits halfway closer to row 1 */
   }
   #disclaimer-footer .footer-row:first-child > a:first-child { order: 1; }          /* HOW TO PLAY */
   #disclaimer-footer .footer-row:first-child > span.buy-ticket-wrap { order: 2; }  /* BUY TICKET */
