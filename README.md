@@ -16,7 +16,7 @@
 * **The Ticket Store:** Spend your lifetime Total Treasury on five themed question packs -- each unlocking hundreds of additional KJV questions and a matching category-only way to play. See below for details.
 * **Procedural Web Audio API Sound Effects:** Sound effects and train ambient audio generated programmatically via JavaScript -- no audio assets required for gameplay. The title-screen weather music is embedded in the page.
 * **The Jerusalem Herald News Ticker:** A two-line LED marquee on the title screen delivers scrolling live weather from the Holy Land and a rotating feed of KJV-inspired "breaking news" headlines -- see below for details.
-* **Title Videos:** Three cinematic clips play over the title-train picture on a two-minute rotation -- `title-intro.mp4` on page load, then `time-tunnel.mp4`, then `jerusalem-entry.mp4`, looping. Each launch is announced with an amber ticker warning ("WARNING: BULLET LINE DEPARTING ON ANOTHER ADVENTURE") plus a 3-2-1 countdown (desktop only), and the ↻ button replays the intro anytime. See below for details.
+* **Title Videos:** Four cinematic clips play over the title-train picture on a two-minute rotation -- `title-intro.mp4` on page load, then `time-tunnel.mp4`, then `sea-of-galilee.mp4`, then `jerusalem-entry.mp4`, looping. Each launch is announced with an amber ticker warning ("WARNING: BULLET LINE DEPARTING ON ANOTHER ADVENTURE") plus a 3-2-1 countdown (desktop only), and the ↻ button replays the intro anytime. See below for details.
 * **Responsive & Immersive UI:** Features a custom neon train CSS layout, animated fog background, mobile-optimized scripture viewing drawers, and dynamic game statistics tracking.
 
 ---
@@ -41,13 +41,14 @@ If you've bought one or more question packs from the Ticket Store (see below), t
 
 ## 🎬 Title Videos
 
-Three cinematic clips play over the title-train picture on the title screen:
+Four cinematic clips play over the title-train picture on the title screen:
 
 * `title-intro.mp4` -- Plays automatically on page load.
 * `time-tunnel.mp4` -- A train ride through a time vortex.
+* `sea-of-galilee.mp4` -- A bullet train crossing the Sea of Galilee at sunset.
 * `jerusalem-entry.mp4` -- A lightning train arriving over the city.
 
-They run on a rotation: the intro plays on load, then the title picture returns; two minutes later `time-tunnel.mp4` plays, two minutes after that `jerusalem-entry.mp4` plays, then the loop starts over from the intro. The rotation runs the same on phone and desktop.
+They run on a rotation: the intro plays on load, then the title picture returns; two minutes later `time-tunnel.mp4` plays, two minutes after that `sea-of-galilee.mp4` plays, two minutes after that `jerusalem-entry.mp4` plays, then the loop starts over from the intro. The rotation runs the same on phone and desktop.
 
 * The videos fill the title picture exactly, playing above it but below the treasury HUD, so your Shekels stay visible.
 * Video sound follows the sound switch -- the clips stay muted until you turn sound on.
@@ -227,7 +228,7 @@ The project is organized into a handful of files rather than a single monolithic
 * `questions.json` -- The KJV question bank (100 free questions plus 901 across the five Ticket Store packs -- 1,001 total), including scripture references, quotes, and answer choices.
 * `store.html` -- The standalone Ticket Store page described above, sharing the game's branding, fog background, and visual style.
 * `logo.png` -- The game's logo image.
-* `title-intro.mp4`, `time-tunnel.mp4`, `jerusalem-entry.mp4` -- The three title-screen videos (see Title Videos above). They must sit next to `index.html`.
+* `title-intro.mp4`, `time-tunnel.mp4`, `sea-of-galilee.mp4`, `jerusalem-entry.mp4` -- The four title-screen videos (see Title Videos above). They must sit next to `index.html`.
 * `LICENSE` -- Project license terms (plain text).
 * `license.html` -- The same license terms as a styled web page.
 
