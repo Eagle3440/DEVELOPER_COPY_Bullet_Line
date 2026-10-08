@@ -2420,13 +2420,9 @@
     background: rgba(4, 10, 20, 0.98);
   }
 
-  /* --- Footer links: all five on one line on phones (2026-10-07) ---
-         Measured with Montserrat Bold: ~320px total at these sizes,
-         fits 360px+ phones. --- */
-  #disclaimer-footer { font-size: 0.58rem; }
-  #disclaimer-footer .footer-row { flex-wrap: nowrap; gap: 5px; letter-spacing: 0.1px; }
-  #disclaimer-footer a { padding: 2px 3px; white-space: nowrap; }
-  #disclaimer-footer .footer-copy { font-size: 0.58rem; }
+  /* --- Phone footer (2026-10-07): regular size, wraps to two centered
+         lines. The 0.58rem one-line experiment looked bad on his Android;
+         desktop styling applies as-is. --- */
 
   /* --- Title-screen treasury layout (2026-10-05): HIGH SCORE centered at
          the top of the train picture, TREASURY bottom-left, TOTAL TREASURY
