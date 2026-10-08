@@ -404,11 +404,11 @@
     // the webp box by CSS, layered above the picture but below the treasury
     // status bar. When a video ends (or fails), the webp underneath comes back.
     // While the title screen is showing, the videos rotate on their own every
-    // 2 minutes: intro -> time-tunnel -> sea-of-galilee -> jerusalem-entry -> pool-of-bethesda -> bethany -> intro ...
+    // 2 minutes: intro -> time-tunnel -> sea-of-galilee -> jerusalem-entry -> pool-of-bethesda -> bethany -> jericho -> intro ...
     // A 3-2-1 countdown shows bottom-left of the picture before each automatic
     // video (desktop only; the page-load intro plays immediately).
     // The replay button replays the intro (restarts the rotation).
-    const TITLE_PLAYLIST = ['title-intro.mp4', 'time-tunnel.mp4', 'sea-of-galilee.mp4', 'jerusalem-entry.mp4', 'pool-of-bethesda.mp4', 'bethany.mp4'];
+    const TITLE_PLAYLIST = ['title-intro.mp4', 'time-tunnel.mp4', 'sea-of-galilee.mp4', 'jerusalem-entry.mp4', 'pool-of-bethesda.mp4', 'bethany.mp4', 'jericho.mp4'];
     // Destination names for the ticker launch warning — the alert names where
     // the bullet train is headed. Phone shows the shortened destination only
     // (his call — the full line would clip on the narrow phone ticker).
@@ -418,7 +418,8 @@
       'sea-of-galilee.mp4':   { full: 'THE SEA OF GALILEE',   short: 'SEA OF GALILEE' },
       'jerusalem-entry.mp4':  { full: 'JERUSALEM',            short: 'JERUSALEM' },
       'pool-of-bethesda.mp4': { full: 'THE POOL OF BETHESDA', short: 'POOL OF BETHESDA' },
-      'bethany.mp4':          { full: 'BETHANY',              short: 'BETHANY' }
+      'bethany.mp4':          { full: 'BETHANY',              short: 'BETHANY' },
+      'jericho.mp4':          { full: 'JERICHO',              short: 'JERICHO' }
     };
     // Builds the launch-warning text for the upcoming video — titlePlaylistIdx
     // is already pointing at it when the warning shows.
