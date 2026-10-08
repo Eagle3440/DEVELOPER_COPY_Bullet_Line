@@ -238,3 +238,7 @@ The project is organized into a handful of files rather than a single monolithic
 (c) 2026 William Monti. All rights reserved.
 
 This game is proprietary software. See the LICENSE file for the full terms: no copying, modifying, distributing, or selling any part of the game without written permission.
+
+---
+
+[HOW TO PLAY](readme.html) | [FEEDBACK](mailto:billpmonti@gmail.com) | [LICENSE](license.html) | [TERMS](terms.html) | [BUY TICKET](store.html)
