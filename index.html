@@ -1469,6 +1469,7 @@
     const ledTickerMsg = document.getElementById('led-ticker-msg');
     const ledTickerMsg2 = document.getElementById('led-ticker-msg2');
     const LED_MSG_1 = "Welcome to The Bullet Line: Scripture Pursuit (KJV)";
+    const LED_MSG_1_SHORT = "Bullet Line: Scripture Pursuit (KJV)"; // phone ticker line 1 (small space)
     const LED_MSG_2 = "PLAY AND USE YOUR WINNING SHEKELS TO BUY PREMIUM BULLET TRAIN TICKETS TO EARN MORE QUESTIONS AND INCREASE YOUR KNOWLEDGE OF THE KJV BIBLE - VISIT THE TICKET COUNTER TODAY AND SPEAK WITH YOUR TICKET REPRESENTATIVE FOR MORE INFORMATION";
     const LED_MSG_3 = "BROUGHT TO YOU BY THE BULLET LINE EXPRESS LIGHTING-SPEED BIBLE NETWORK";
     const LED_MSG_4 = "STEP ABOARD THE BULLET LINE EXPRESS FOR A JOURNEY BACK THROUGH TIME - RELIVE REAL EVENTS STRAIGHT FROM THE PAGES OF SCRIPTURE";
@@ -1626,12 +1627,12 @@
     ];
 
     const LED_TICKER_LINE1_STEPS = [
-      { getText: () => LED_MSG_1, from: (vw, w) => (vw - w) / 2, to: (vw, w) => (vw - w) / 2, duration: () => 15 },
+      { getText: () => (isPhoneWidth() ? LED_MSG_1_SHORT : LED_MSG_1), from: (vw, w) => (vw - w) / 2, to: (vw, w) => (vw - w) / 2, duration: () => 15 },
       { from: (vw, w) => (vw - w) / 2, to: (vw, w) => -w, duration: () => 3.5 },
       { getText: () => LED_MSG_2, from: (vw) => vw, to: (vw, w) => -w, duration: (vw, w) => (vw + w) / TICKER_SPEED },
       { getText: () => LED_MSG_3, from: (vw) => vw, to: (vw, w) => -w, duration: (vw, w) => (vw + w) / TICKER_SPEED },
       { getText: () => LED_MSG_4, from: (vw) => vw, to: (vw, w) => -w, duration: (vw, w) => (vw + w) / TICKER_SPEED },
-      { getText: () => LED_MSG_1, from: (vw) => vw, to: (vw, w) => (vw - w) / 2, duration: () => 3.5 }
+      { getText: () => (isPhoneWidth() ? LED_MSG_1_SHORT : LED_MSG_1), from: (vw) => vw, to: (vw, w) => (vw - w) / 2, duration: () => 3.5 }
     ];
 
     // Line 2 (bottom, faster speed): weather, then a rotating "breaking news" report on a KJV event,
