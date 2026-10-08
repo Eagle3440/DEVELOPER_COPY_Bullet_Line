@@ -241,4 +241,4 @@ This game is proprietary software. See the LICENSE file for the full terms: no c
 
 ---
 
-[HOW TO PLAY](readme.html) | [FEEDBACK](mailto:billpmonti@gmail.com) | [LICENSE](license.html) | [TERMS](terms.html) | [BUY TICKET](store.html)
+[HOW TO PLAY](readme.html) | [FEEDBACK](mailto:billpmonti@gmail.com) | [BUY TICKET](store.html) | [TERMS](terms.html) | [LICENSE](license.html)
