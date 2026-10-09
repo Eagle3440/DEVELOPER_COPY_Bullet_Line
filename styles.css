@@ -2566,4 +2566,29 @@
     display: none !important;
   }
 
+  /* --- Learning Library header (2026-10-09): center the LEARNING LIBRARY
+         title across the full header row on phone so it can't crowd the
+         ← BACK link. Back pinned left, card count pinned right. --- */
+  .library-head {
+    position: relative;
+    display: block;
+    text-align: center;
+  }
+  .library-title {
+    font-size: 1.05rem;
+    letter-spacing: 1px;
+  }
+  .library-back {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  .library-count {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
 }
