@@ -428,12 +428,34 @@
       const d = TITLE_DESTINATIONS[TITLE_PLAYLIST[titlePlaylistIdx]] || TITLE_DESTINATIONS['title-intro.mp4'];
       return isPhoneWidth() ? d.short : `⚠ WARNING: BULLET LINE DEPARTING FOR ${d.full} ⚠`;
     }
+    // Next-departure ticker line: names the upcoming rotation video with a live
+    // countdown from the 2-minute replay timer. When no replay is scheduled
+    // (a video is playing or about to), it names what's on now instead.
+    function departureTickerText() {
+      const phone = isPhoneWidth();
+      const nextIdx = (titlePlaylistIdx + 1) % TITLE_PLAYLIST.length;
+      const d = TITLE_DESTINATIONS[TITLE_PLAYLIST[nextIdx]] || TITLE_DESTINATIONS['title-intro.mp4'];
+      const dest = phone ? d.short : d.full;
+      let remainMs = null;
+      if (titleIntroScheduledAt !== null && titleIntroTimer) {
+        remainMs = TITLE_INTRO_REPLAY_MS - (Date.now() - titleIntroScheduledAt);
+      }
+      if (remainMs !== null && remainMs > 0) {
+        const s = Math.ceil(remainMs / 1000);
+        const mmss = Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+        return phone ? `NEXT: ${dest} ${mmss}` : `NEXT DEPARTURE: ${dest} IN ${mmss}`;
+      }
+      const cur = TITLE_DESTINATIONS[TITLE_PLAYLIST[titlePlaylistIdx]] || TITLE_DESTINATIONS['title-intro.mp4'];
+      const curDest = phone ? cur.short : cur.full;
+      return phone ? `NOW: ${curDest}` : `NOW SHOWING: ${curDest}`;
+    }
     const TITLE_INTRO_REPLAY_MS = 2 * 60 * 1000;
     const TITLE_LAUNCHING_MS = 3000; // LAUNCHING shows this long before the video
     const TITLE_WARNING_LEAD_MS = 3000; // warning shows this long before LAUNCHING
     const TITLE_FADE_IN_MS = 500; // video -> black
     const TITLE_FADE_OUT_MS = 600; // black -> title picture
     let titleIntroTimer = null;
+    let titleIntroScheduledAt = null; // Date.now() when the 2-min replay timer was set; feeds the ticker's departure countdown
     let titleLaunchingTimer = null;
     let titleFadeTimer1 = null;
     let titleFadeTimer2 = null;
@@ -445,6 +467,7 @@
     let titleTickerReady = false;
     function clearTitleIntroTimer() {
       if (titleIntroTimer) { clearTimeout(titleIntroTimer); titleIntroTimer = null; }
+      titleIntroScheduledAt = null;
     }
     function clearTitleWarningTimer() {
       if (titleWarningTimer) { clearTimeout(titleWarningTimer); titleWarningTimer = null; }
@@ -520,12 +543,14 @@
       clearTitleIntroTimer();
       titleIntroTimer = setTimeout(() => {
         titleIntroTimer = null;
+        titleIntroScheduledAt = null;
         // Backstop: a game start clears the timer via hideTitleIntro, so this
         // should only fire on the title screen — but never replay mid-game.
         if (!document.getElementById('start-game-btn').classList.contains('hidden')) {
           playTitlePlaylistIndex((titlePlaylistIdx + 1) % TITLE_PLAYLIST.length, true);
         }
       }, TITLE_INTRO_REPLAY_MS);
+      titleIntroScheduledAt = Date.now();
     }
     function clearTitleFadeTimers() {
       if (titleFadeTimer1) { clearTimeout(titleFadeTimer1); titleFadeTimer1 = null; }
@@ -1299,6 +1324,35 @@
     const TICKET_PACK_PRICES = {
       torah: 50000, gospels: 125000, kings: 250000, prophets: 500000, epistles: 1000000
     };
+    const TICKET_PACK_NAMES = {
+      torah: 'TORAH', gospels: 'GOSPELS', kings: 'KINGS & HISTORY',
+      prophets: 'PROPHETS & WISDOM', epistles: 'EPISTLES & REVELATION'
+    };
+    // Dynamic shekel nudge for ticker line 1 (replaced the old static promo
+    // 2026-10-08): reads the live Total Treasury and names the next-cheapest
+    // ticket he doesn't own — or celebrates when all five are owned.
+    function shekelNudgeText() {
+      const phone = isPhoneWidth();
+      const owned = getOwnedPackIds();
+      const unowned = Object.keys(TICKET_PACK_PRICES).filter((id) => !owned.includes(id));
+      if (!unowned.length) {
+        return phone ? 'ALL TICKETS OWNED — 901 EXTRA QUESTIONS'
+                     : 'ALL 5 BULLET TRAIN TICKETS OWNED — 901 EXTRA QUESTIONS UNLOCKED';
+      }
+      let nextId = unowned[0], nextPrice = TICKET_PACK_PRICES[nextId];
+      unowned.forEach((id) => {
+        if (TICKET_PACK_PRICES[id] < nextPrice) { nextId = id; nextPrice = TICKET_PACK_PRICES[id]; }
+      });
+      const name = TICKET_PACK_NAMES[nextId] || nextId.toUpperCase();
+      const have = totalTreasuryAccount;
+      const fmt = (n) => n.toLocaleString();
+      if (have >= nextPrice) {
+        return phone ? `ALL ABOARD — YOU CAN AFFORD THE ${name} TICKET`
+                     : `ALL ABOARD — YOU CAN AFFORD THE ${name} TICKET (${fmt(nextPrice)} SHEKELS)`;
+      }
+      return phone ? `${fmt(have)} SHEKELS — ${name}: ${fmt(nextPrice)}`
+                   : `YOU HAVE ${fmt(have)} SHEKELS — ${name} TICKET: ${fmt(nextPrice)} SHEKELS`;
+    }
 
     // Shekel total at the moment the player last clicked BUY TICKET. The
     // glow stays off until totalTreasuryAccount climbs past this value again
@@ -1525,9 +1579,10 @@
     const ledTickerLine2El = document.getElementById('led-ticker-line2');
     const ledTickerMsg = document.getElementById('led-ticker-msg');
     const ledTickerMsg2 = document.getElementById('led-ticker-msg2');
-    const LED_MSG_1 = "Welcome to The Bullet Line: Scripture Pursuit (KJV)";
+    const LED_MSG_1 = "Welcome aboard the Bullet Line: Scripture Pursuit (KJV)";
     const LED_MSG_1_SHORT = "Bullet Line: Scripture Pursuit"; // phone ticker line 1 (small space; KJV dropped 2026-10-07 — clipped on his Android)
-    const LED_MSG_2 = "PLAY AND USE YOUR WINNING SHEKELS TO BUY PREMIUM BULLET TRAIN TICKETS TO EARN MORE QUESTIONS AND INCREASE YOUR KNOWLEDGE OF THE KJV BIBLE - VISIT THE TICKET COUNTER TODAY AND SPEAK WITH YOUR TICKET REPRESENTATIVE FOR MORE INFORMATION";
+    // LED_MSG_2's old static ticket promo was replaced 2026-10-08 by the dynamic
+    // shekel nudge (shekelNudgeText) — same slot, personalized to his treasury.
     const LED_MSG_3 = "BROUGHT TO YOU BY THE BULLET LINE EXPRESS LIGHTING-SPEED BIBLE NETWORK";
     const LED_MSG_4 = "STEP ABOARD THE BULLET LINE EXPRESS FOR A JOURNEY BACK THROUGH TIME - RELIVE REAL EVENTS STRAIGHT FROM THE PAGES OF SCRIPTURE";
 
@@ -1683,10 +1738,15 @@
       }
     ];
 
+    // Line 1 rotation (2026-10-08): welcome -> next-departure countdown ->
+    // dynamic shekel nudge -> network line -> journey line -> welcome.
+    // getText runs fresh on every pass, so the countdown and the nudge
+    // always read the live timer and treasury.
     const LED_TICKER_LINE1_STEPS = [
       { getText: () => (isPhoneWidth() ? LED_MSG_1_SHORT : LED_MSG_1), from: (vw, w) => (vw - w) / 2, to: (vw, w) => (vw - w) / 2, duration: () => 15 },
       { from: (vw, w) => (vw - w) / 2, to: (vw, w) => -w, duration: () => 3.5 },
-      { getText: () => LED_MSG_2, from: (vw) => vw, to: (vw, w) => -w, duration: (vw, w) => (vw + w) / TICKER_SPEED },
+      { getText: () => departureTickerText(), from: (vw) => vw, to: (vw, w) => -w, duration: (vw, w) => (vw + w) / TICKER_SPEED },
+      { getText: () => shekelNudgeText(), from: (vw) => vw, to: (vw, w) => -w, duration: (vw, w) => (vw + w) / TICKER_SPEED },
       { getText: () => LED_MSG_3, from: (vw) => vw, to: (vw, w) => -w, duration: (vw, w) => (vw + w) / TICKER_SPEED },
       { getText: () => LED_MSG_4, from: (vw) => vw, to: (vw, w) => -w, duration: (vw, w) => (vw + w) / TICKER_SPEED },
       { getText: () => (isPhoneWidth() ? LED_MSG_1_SHORT : LED_MSG_1), from: (vw) => vw, to: (vw, w) => (vw - w) / 2, duration: () => 3.5 }
