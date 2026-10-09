@@ -31,7 +31,7 @@
   <meta property="og:url" content="https://eagle3440.github.io/scripture-pursuit/" />
   <meta property="og:type" content="website" />
 
-  <link rel="stylesheet" href="styles.css?v=37">
+  <link rel="stylesheet" href="styles.css?v=39">
   <script src="https://cdn.jsdelivr.net/npm/gameanalytics@4.0.0/umd/gameanalytics.min.js"></script>
 </head>
 <body>
@@ -128,8 +128,9 @@
       <div id="main-title" class="train-logo-wrapper">
         <img id="title-train-img" src="title-train.webp" alt="The Bullet Line" class="train-title-image">
         <video id="title-intro-video" class="title-intro-video" src="title-intro.mp4" muted playsinline preload="auto" aria-label="Title intro video"></video>
+        <div id="title-fade-veil" class="title-fade-veil" aria-hidden="true"></div>
         <button id="title-intro-replay" class="title-intro-replay" type="button" aria-label="Replay intro video" title="Replay intro video">&#8635;</button>
-        <div id="title-countdown" class="title-countdown hidden" aria-hidden="true">3</div>
+        <div id="title-launching" class="title-launching hidden" aria-hidden="true"><span>L</span><span>A</span><span>U</span><span>N</span><span>C</span><span>H</span><span>I</span><span>N</span><span>G</span></div>
         <div class="status-bar">
           <div>TREASURY: <span id="bank-val" class="bank-text">0 Shekels</span><span id="combo-val" class="combo-text"></span></div>
           <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;">
@@ -405,7 +406,7 @@
     // status bar. When a video ends (or fails), the webp underneath comes back.
     // While the title screen is showing, the videos rotate on their own every
     // 2 minutes: intro -> time-tunnel -> sea-of-galilee -> jerusalem-entry -> pool-of-bethesda -> bethany -> jericho -> intro ...
-    // A 3-2-1 countdown shows bottom-left of the picture before each automatic
+    // A LAUNCHING ignition shows bottom-left of the picture before each automatic
     // video (desktop only; the page-load intro plays immediately).
     // The replay button replays the intro (restarts the rotation).
     const TITLE_PLAYLIST = ['title-intro.mp4', 'time-tunnel.mp4', 'sea-of-galilee.mp4', 'jerusalem-entry.mp4', 'pool-of-bethesda.mp4', 'bethany.mp4', 'jericho.mp4'];
@@ -428,11 +429,14 @@
       return isPhoneWidth() ? d.short : `⚠ WARNING: BULLET LINE DEPARTING FOR ${d.full} ⚠`;
     }
     const TITLE_INTRO_REPLAY_MS = 2 * 60 * 1000;
-    const TITLE_COUNTDOWN_STEPS = ['3', '2', '1'];
-    const TITLE_COUNTDOWN_STEP_MS = 1000;
-    const TITLE_WARNING_LEAD_MS = 3000; // warning shows this long before the countdown
+    const TITLE_LAUNCHING_MS = 3000; // LAUNCHING shows this long before the video
+    const TITLE_WARNING_LEAD_MS = 3000; // warning shows this long before LAUNCHING
+    const TITLE_FADE_IN_MS = 500; // video -> black
+    const TITLE_FADE_OUT_MS = 600; // black -> title picture
     let titleIntroTimer = null;
-    let titleCountdownInt = null;
+    let titleLaunchingTimer = null;
+    let titleFadeTimer1 = null;
+    let titleFadeTimer2 = null;
     let titleWarningTimer = null;
     let titlePlaylistIdx = 0;
     // Set true once the welcome LED ticker is running (see startWelcomeLedTicker).
@@ -479,38 +483,38 @@
         ledTickerLine1.start(LED_TICKER_LINE1_STEPS, { loop: true });
       }, 650);
     }
-    function hideTitleCountdown() {
-      if (titleCountdownInt) { clearInterval(titleCountdownInt); titleCountdownInt = null; }
-      const cd = document.getElementById('title-countdown');
-      if (cd) cd.classList.add('hidden');
+    function hideTitleLaunching() {
+      if (titleLaunchingTimer) { clearTimeout(titleLaunchingTimer); titleLaunchingTimer = null; }
+      const lw = document.getElementById('title-launching');
+      if (lw) {
+        lw.classList.add('hidden');
+        lw.querySelectorAll('span').forEach((sp) => sp.classList.remove('lit'));
+      }
     }
     function isPhoneWidth() {
       return window.matchMedia('(max-width: 767px)').matches;
     }
-    // 3-2-1 on the title picture before an automatic rotation video (desktop
-    // only — phone plays immediately). done() fires after the "1" clears.
-    function runTitleCountdown(done) {
-      const cd = document.getElementById('title-countdown');
-      if (!cd || isPhoneWidth()) { done(); return; }
-      let s = 0;
-      cd.textContent = TITLE_COUNTDOWN_STEPS[s];
-      cd.classList.remove('hidden');
-      playSound('countdown-tick'); // beep on "3", same as the race verse countdown
-      titleCountdownInt = setInterval(() => {
-        // Game started mid-countdown: bail out, never play over a game.
+    // LAUNCHING ignition on the title picture before an automatic rotation
+    // video (desktop only — phone plays immediately). Letters light up L→R
+    // across the 3 seconds, one pass; done() fires when the video starts.
+    function runTitleLaunching(done) {
+      const lw = document.getElementById('title-launching');
+      if (!lw || isPhoneWidth()) { done(); return; }
+      hideTitleLaunching(); // reset any previous run
+      const letters = lw.querySelectorAll('span');
+      lw.classList.remove('hidden');
+      void lw.offsetWidth; // reflow so the ignition restarts clean
+      letters.forEach((sp) => sp.classList.add('lit'));
+      titleLaunchingTimer = setTimeout(() => {
+        titleLaunchingTimer = null;
+        // Game started mid-launch: bail out, never play over a game.
         if (document.getElementById('start-game-btn').classList.contains('hidden')) {
-          hideTitleCountdown();
+          hideTitleLaunching();
           return;
         }
-        s++;
-        if (s >= TITLE_COUNTDOWN_STEPS.length) {
-          hideTitleCountdown();
-          done();
-        } else {
-          cd.textContent = TITLE_COUNTDOWN_STEPS[s];
-          playSound('countdown-tick'); // beep on "2" and "1"
-        }
-      }, TITLE_COUNTDOWN_STEP_MS);
+        hideTitleLaunching();
+        done();
+      }, TITLE_LAUNCHING_MS);
     }
     function scheduleTitleIntroReplay() {
       clearTitleIntroTimer();
@@ -523,12 +527,43 @@
         }
       }, TITLE_INTRO_REPLAY_MS);
     }
+    function clearTitleFadeTimers() {
+      if (titleFadeTimer1) { clearTimeout(titleFadeTimer1); titleFadeTimer1 = null; }
+      if (titleFadeTimer2) { clearTimeout(titleFadeTimer2); titleFadeTimer2 = null; }
+    }
+    // Snap the fade veil back to transparent instantly (mid-fade game start).
+    function snapTitleVeil() {
+      const veil = document.getElementById('title-fade-veil');
+      if (!veil) return;
+      veil.style.transition = 'none';
+      veil.style.opacity = '0';
+      void veil.offsetWidth;
+      veil.style.transition = '';
+    }
     function showTitlePicture() {
       introVideoPlaying = false;
       const iv = document.getElementById('title-intro-video');
-      if (iv) { iv.pause(); iv.classList.add('hidden'); }
+      const veil = document.getElementById('title-fade-veil');
+      const videoVisible = iv && !iv.classList.contains('hidden');
       restoreTickerLine1();
       scheduleTitleIntroReplay();
+      if (!videoVisible || !veil) {
+        // Nothing to fade (error before it ever showed): instant cut, as before.
+        if (iv) { iv.pause(); iv.classList.add('hidden'); }
+        snapTitleVeil();
+        return;
+      }
+      // Fade through black: veil to black, hide the video underneath,
+      // then veil back out to reveal the title picture.
+      clearTitleFadeTimers();
+      veil.style.opacity = '1';
+      titleFadeTimer1 = setTimeout(() => {
+        titleFadeTimer1 = null;
+        iv.pause();
+        iv.classList.add('hidden');
+        veil.style.opacity = '0';
+        titleFadeTimer2 = setTimeout(() => { titleFadeTimer2 = null; }, TITLE_FADE_OUT_MS);
+      }, TITLE_FADE_IN_MS);
     }
     function playTitleVideo(src) {
       const iv = document.getElementById('title-intro-video');
@@ -543,16 +578,18 @@
     }
     function playTitlePlaylistIndex(i, withCountdown) {
       titlePlaylistIdx = i;
-      hideTitleCountdown(); // a new play cancels any running countdown
+      hideTitleLaunching(); // a new play cancels any running launch word
       clearTitleWarningTimer();
+      clearTitleFadeTimers(); // a new play cancels any running fade
+      snapTitleVeil();
       if (withCountdown) {
-        // Warning first, then the 3-2-1, then the video.
+        // Warning first, then LAUNCHING, then the video.
         showTitleLaunchWarning();
         cutTitleWeatherMusic();
         titleWarningTimer = setTimeout(() => {
           titleWarningTimer = null;
           if (document.getElementById('start-game-btn').classList.contains('hidden')) return;
-          runTitleCountdown(() => playTitleVideo(TITLE_PLAYLIST[i]));
+          runTitleLaunching(() => playTitleVideo(TITLE_PLAYLIST[i]));
         }, TITLE_WARNING_LEAD_MS);
       } else {
         showTitleLaunchWarning();
@@ -564,7 +601,9 @@
     function hideTitleIntro() {
       clearTitleIntroTimer();
       clearTitleWarningTimer();
-      hideTitleCountdown();
+      clearTitleFadeTimers();
+      snapTitleVeil();
+      hideTitleLaunching();
       restoreTickerLine1();
       introVideoPlaying = false;
       const iv = document.getElementById('title-intro-video');
