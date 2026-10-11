@@ -1474,14 +1474,15 @@
     // Train X personas: the player picks the rival's smarts on the opponent
     // screen after START GAME. Names imply the risk; the bounty rewards it.
     const OPPONENTS = [
-      { id: 'scribe',   name: 'SCRIBE',   epithet: 'The steady student',       tagline: 'A fair race. A fair purse.',      acc: 0.68, bonus: 1,    accent: '#4d9de0', img: 'opponent-scribe.jpg' },
+      { id: 'disciple',   name: 'DISCIPLE',   epithet: 'The steady student',       tagline: 'A fair race. A fair purse.',      acc: 0.68, bonus: 1,    accent: '#4d9de0', img: 'opponent-disciple.jpg' },
       { id: 'scholar',  name: 'SCHOLAR',  epithet: 'The sharp mind',           tagline: 'He studies your every move.',     acc: 0.76, bonus: 1.25, accent: '#d4af37', img: 'opponent-scholar.jpg' },
       { id: 'prophet',  name: 'PROPHET',  epithet: 'The seer',                 tagline: 'He has already seen the finish.', acc: 0.84, bonus: 1.5,  accent: '#e0455a', img: 'opponent-prophet.jpg' },
     ];
     const OPPONENT_KEY = 'bulletline_opponent';
     function loadChosenOpponent() {
       try {
-        const id = localStorage.getItem(OPPONENT_KEY);
+        let id = localStorage.getItem(OPPONENT_KEY);
+        if (id === 'scribe') id = 'disciple'; // opponent renamed 2026-10-11
         return OPPONENTS.find(o => o.id === id) || OPPONENTS[0];
       } catch (e) { return OPPONENTS[0]; }
     }
@@ -1490,7 +1491,10 @@
     function loadRivalry() {
       try {
         const r = JSON.parse(localStorage.getItem(RIVALRY_KEY));
-        if (r && typeof r === 'object') return r;
+        if (r && typeof r === 'object') {
+          if (r.scribe && !r.disciple) r.disciple = r.scribe; // opponent renamed 2026-10-11: carry the record over
+          return r;
+        }
       } catch (e) {}
       return {};
     }
@@ -2459,7 +2463,7 @@
 
     function selectLine(lineId) {
       chosenLine = lineId;
-      // Train X races at the smarts the player chose: Scribe 68%, Scholar 76%, Prophet 84%.
+      // Train X races at the smarts the player chose: Disciple 68%, Scholar 76%, Prophet 84%.
       trainXBase = chosenOpponent.acc;
       trainXPos = 7;
       trainXFrozenRounds = 0;
