@@ -405,11 +405,22 @@
     // the webp box by CSS, layered above the picture but below the treasury
     // status bar. When a video ends (or fails), the webp underneath comes back.
     // While the title screen is showing, the videos rotate on their own every
-    // 2 minutes: intro -> time-tunnel -> sea-of-galilee -> galilee-hillside -> jerusalem-entry -> pool-of-bethesda -> bethany -> jericho -> intro ...
+    // 2 minutes: title-intro always plays first (the opening scene stays the
+    // same), then the other nine play in a random order that is shuffled once
+    // per session (Fisher-Yates, same as the hazard deck) — every video plays
+    // exactly once per loop, and the loop repeats in the same shuffled order.
     // A LAUNCHING ignition shows bottom-left of the picture before each automatic
     // video (desktop only; the page-load intro plays immediately).
     // The replay button replays the intro (restarts the rotation).
-    const TITLE_PLAYLIST = ['title-intro.mp4', 'time-tunnel.mp4', 'sea-of-galilee.mp4', 'galilee-hillside.mp4', 'jerusalem-entry.mp4', 'pool-of-bethesda.mp4', 'bethany.mp4', 'jericho.mp4', 'mount-ararat.mp4'];
+    const TITLE_PLAYLIST = ['title-intro.mp4'];
+    (function shuffleTitlePlaylist() {
+      const rest = ['time-tunnel.mp4', 'sea-of-galilee.mp4', 'galilee-hillside.mp4', 'jerusalem-entry.mp4', 'pool-of-bethesda.mp4', 'bethany.mp4', 'jericho.mp4', 'mount-ararat.mp4', 'jerusalem-tomb.mp4'];
+      for (let i = rest.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [rest[i], rest[j]] = [rest[j], rest[i]];
+      }
+      TITLE_PLAYLIST.push(...rest);
+    })();
     // Destination names for the ticker launch warning — the alert names where
     // the bullet train is headed. Phone shows the shortened destination only
     // (his call — the full line would clip on the narrow phone ticker).
@@ -422,7 +433,8 @@
       'pool-of-bethesda.mp4': { full: 'THE POOL OF BETHESDA', short: 'POOL OF BETHESDA' },
       'bethany.mp4':          { full: 'BETHANY',              short: 'BETHANY' },
       'jericho.mp4':          { full: 'JERICHO',              short: 'JERICHO' },
-      "mount-ararat.mp4":     { full: "MOUNT ARARAT \u2014 NOAH'S ARK", short: "MOUNT ARARAT" }
+      "mount-ararat.mp4":     { full: "MOUNT ARARAT \u2014 NOAH'S ARK", short: "MOUNT ARARAT" },
+      'jerusalem-tomb.mp4':   { full: 'JERUSALEM \u2014 THE EMPTY TOMB / RESURRECTION', short: 'THE EMPTY TOMB' }
     };
     // Builds the launch-warning text for the upcoming video — titlePlaylistIdx
     // is already pointing at it when the warning shows.
@@ -460,6 +472,7 @@
     let titleFadeTimer1 = null;
     let titleFadeTimer2 = null;
     let titleWarningTimer = null;
+    let titleWarningScheduledAt = null; // Date.now() when the warning lead started; feeds the background-tab resume
     let titlePlaylistIdx = 0;
     // Set true once the welcome LED ticker is running (see startWelcomeLedTicker).
     // Guards the launch-warning hooks so the page-load autoplay (which runs
@@ -471,6 +484,7 @@
     }
     function clearTitleWarningTimer() {
       if (titleWarningTimer) { clearTimeout(titleWarningTimer); titleWarningTimer = null; }
+      titleWarningScheduledAt = null;
     }
     // Cut the weather music while a title video (and its warning) is happening.
     // Direct DOM access on purpose: safe to call even before the ticker exists.
@@ -538,8 +552,12 @@
     function isPhoneWidth() {
       return window.matchMedia('(max-width: 767px)').matches;
     }
-    function scheduleTitleIntroReplay() {
+    function scheduleTitleIntroReplay(delayMs) {
       clearTitleIntroTimer();
+      // Optional delay (used by the background-tab resume to re-arm the timer
+      // with the time that was left when the tab hid). titleIntroScheduledAt
+      // is back-dated so the ticker's NEXT DEPARTURE countdown stays exact.
+      const ms = (typeof delayMs === 'number' && delayMs >= 0) ? delayMs : TITLE_INTRO_REPLAY_MS;
       titleIntroTimer = setTimeout(() => {
         titleIntroTimer = null;
         titleIntroScheduledAt = null;
@@ -548,8 +566,8 @@
         if (!document.getElementById('start-game-btn').classList.contains('hidden')) {
           playTitlePlaylistIndex((titlePlaylistIdx + 1) % TITLE_PLAYLIST.length, true);
         }
-      }, TITLE_INTRO_REPLAY_MS);
-      titleIntroScheduledAt = Date.now();
+      }, ms);
+      titleIntroScheduledAt = Date.now() - (TITLE_INTRO_REPLAY_MS - ms);
     }
     function clearTitleFadeTimers() {
       if (titleFadeTimer1) { clearTimeout(titleFadeTimer1); titleFadeTimer1 = null; }
@@ -600,6 +618,19 @@
       const p = iv.play();
       if (p && typeof p.catch === 'function') p.catch(() => showTitlePicture());
     }
+    // Arms the 3-second launch-warning lead before a title video. Extracted so
+    // the background-tab resume can re-arm it with the exact remaining time.
+    function scheduleTitleWarning(delayMs) {
+      clearTitleWarningTimer();
+      const ms = (typeof delayMs === 'number' && delayMs >= 0) ? delayMs : TITLE_WARNING_LEAD_MS;
+      titleWarningScheduledAt = Date.now() - (TITLE_WARNING_LEAD_MS - ms);
+      titleWarningTimer = setTimeout(() => {
+        titleWarningTimer = null;
+        titleWarningScheduledAt = null;
+        if (document.getElementById('start-game-btn').classList.contains('hidden')) return;
+        playTitleVideo(TITLE_PLAYLIST[titlePlaylistIdx]);
+      }, ms);
+    }
     function playTitlePlaylistIndex(i, withCountdown) {
       titlePlaylistIdx = i;
       clearTitleWarningTimer();
@@ -609,11 +640,7 @@
         // Warning on line 1 + LAUNCHING on line 2, then the video.
         showTitleLaunchWarning();
         cutTitleWeatherMusic();
-        titleWarningTimer = setTimeout(() => {
-          titleWarningTimer = null;
-          if (document.getElementById('start-game-btn').classList.contains('hidden')) return;
-          playTitleVideo(TITLE_PLAYLIST[i]);
-        }, TITLE_WARNING_LEAD_MS);
+        scheduleTitleWarning(TITLE_WARNING_LEAD_MS);
       } else {
         showTitleLaunchWarning();
         cutTitleWeatherMusic();
@@ -3439,6 +3466,80 @@
       if (window.setBulletlineTickerSoundSuspended) window.setBulletlineTickerSoundSuspended(false);
       startWelcomeLedTicker();
     }
+
+    // ---- Background-tab hush (2026-10-11): a hidden tab keeps its timers and
+    // audio alive in the background (Brave/Chrome "background apps"), so the
+    // departures board kept clacking every minute after the window was closed.
+    // When the tab hides: freeze the title-screen ambience (board interval,
+    // title rotation timers, LED tickers, title video) and silence ALL game
+    // audio. When it shows again: resume everything where it froze.
+    // Gameplay logic (Builder/race timers and state) is untouched.
+    let hiddenTabState = null;
+    function hushForHiddenTab() {
+      if (!document.hidden || hiddenTabState) return;
+      const st = { introRemainMs: null, warnRemainMs: null, videoWasPlaying: false,
+                   tickersWereActive: false, weatherWasPlaying: false, newsWasPlaying: false };
+      // Departures board: stop the 60s re-flip.
+      if (window.__tickerBoardPause) window.__tickerBoardPause();
+      // Title rotation: freeze timers, remembering the time left on each.
+      if (titleIntroTimer) {
+        st.introRemainMs = titleIntroScheduledAt != null
+          ? Math.max(0, TITLE_INTRO_REPLAY_MS - (Date.now() - titleIntroScheduledAt))
+          : TITLE_INTRO_REPLAY_MS;
+        clearTitleIntroTimer();
+      }
+      if (titleWarningTimer) {
+        st.warnRemainMs = titleWarningScheduledAt != null
+          ? Math.max(0, TITLE_WARNING_LEAD_MS - (Date.now() - titleWarningScheduledAt))
+          : TITLE_WARNING_LEAD_MS;
+        clearTitleWarningTimer();
+      }
+      // A title video mid-play: pause it; it resumes on return.
+      const hiv = document.getElementById('title-intro-video');
+      if (hiv && !hiv.classList.contains('hidden') && !hiv.paused) { hiv.pause(); st.videoWasPlaying = true; }
+      // LED tickers: pause mid-scroll (pause/resume keep the exact position).
+      if (welcomeTickerActive) {
+        ledTickerLine1.pause(); ledTickerLine2.pause(); st.tickersWereActive = true;
+      }
+      // Media elements: pause only those actually playing; resume only those.
+      const hwm = document.getElementById('weather-music-audio');
+      if (hwm && !hwm.paused) { hwm.pause(); st.weatherWasPlaying = true; }
+      const hni = document.getElementById('news-intro-audio');
+      if (hni && !hni.paused) { hni.pause(); st.newsWasPlaying = true; }
+      // Web Audio: suspend both contexts (game SFX + board clacks).
+      if (typeof audioCtx !== 'undefined' && audioCtx && audioCtx.state === 'running') audioCtx.suspend();
+      if (window.__tickerAudioSuspend) window.__tickerAudioSuspend();
+      hiddenTabState = st;
+    }
+    function resumeForVisibleTab() {
+      if (document.hidden || !hiddenTabState) return;
+      const st = hiddenTabState; hiddenTabState = null;
+      // Audio first, so anything resumed below can sound again.
+      if (typeof audioCtx !== 'undefined' && audioCtx && audioCtx.state === 'suspended' && soundEnabled && !soundMuted) {
+        audioCtx.resume();
+      }
+      if (window.__tickerAudioResume) window.__tickerAudioResume();
+      const rwm = document.getElementById('weather-music-audio');
+      if (st.weatherWasPlaying && rwm && soundEnabled && !soundMuted) { const p = rwm.play(); if (p && p.catch) p.catch(() => {}); }
+      const rni = document.getElementById('news-intro-audio');
+      if (st.newsWasPlaying && rni && soundEnabled && !soundMuted) { const p = rni.play(); if (p && p.catch) p.catch(() => {}); }
+      // Departures board: immediate re-render (resyncs the clock), restart 60s.
+      if (window.__tickerBoardResume) window.__tickerBoardResume();
+      // LED tickers: resume mid-scroll.
+      if (st.tickersWereActive && welcomeTickerActive) { ledTickerLine1.resume(); ledTickerLine2.resume(); }
+      // Title video: resume playback, or re-arm whichever timer was frozen.
+      const riv = document.getElementById('title-intro-video');
+      if (st.videoWasPlaying && riv) { const p = riv.play(); if (p && p.catch) p.catch(() => {}); }
+      if (st.warnRemainMs != null) {
+        scheduleTitleWarning(st.warnRemainMs);
+      } else if (st.introRemainMs != null) {
+        scheduleTitleIntroReplay(st.introRemainMs);
+      }
+    }
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) hushForHiddenTab(); else resumeForVisibleTab();
+    });
+    if (document.hidden) hushForHiddenTab(); // loaded straight into a background tab
   </script>
 
   <script>
@@ -3603,7 +3704,7 @@
       };
 
       function tickerPlayClack() {
-        if (!tickerSoundOn || tickerSoundSuspended || tickerSoundMuted || !tickerAudioCtx) return;
+        if (!tickerSoundOn || tickerSoundSuspended || tickerSoundMuted || !tickerAudioCtx || document.hidden) return;
         const dur = 0.03;
         const bufferSize = tickerAudioCtx.sampleRate * dur;
         const buffer = tickerAudioCtx.createBuffer(1, bufferSize, tickerAudioCtx.sampleRate);
@@ -3739,7 +3840,7 @@
       }
 
       tickerRender();
-      setInterval(function () {
+      function tickerBoardIntervalTick() {
         tickerRender();
         ticketListRenderCount++;
         if (ticketListRenderCount >= TICKET_RENDERS_PER_LIST) {
@@ -3751,7 +3852,22 @@
             activeTicketLines = activeTicketLines === TICKET_LINES_A ? TICKET_LINES_B : TICKET_LINES_A;
           }
         }
-      }, 60000);
+      }
+      let tickerBoardIntervalId = setInterval(tickerBoardIntervalTick, 60000);
+      // Background-tab hush hooks (see the visibilitychange handler in the
+      // main script): pause the 60s re-flip while hidden, resume on return.
+      window.__tickerBoardPause = function () {
+        if (tickerBoardIntervalId) { clearInterval(tickerBoardIntervalId); tickerBoardIntervalId = null; }
+      };
+      window.__tickerBoardResume = function () {
+        if (!tickerBoardIntervalId) { tickerRender(); tickerBoardIntervalId = setInterval(tickerBoardIntervalTick, 60000); }
+      };
+      window.__tickerAudioSuspend = function () {
+        if (tickerAudioCtx && tickerAudioCtx.state === "running") tickerAudioCtx.suspend();
+      };
+      window.__tickerAudioResume = function () {
+        if (tickerAudioCtx && tickerAudioCtx.state === "suspended" && tickerSoundOn && !tickerSoundMuted) tickerAudioCtx.resume();
+      };
 
       function tickerUpdateClock() {
         const now = new Date();
