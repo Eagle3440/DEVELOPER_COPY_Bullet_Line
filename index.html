@@ -31,7 +31,7 @@
   <meta property="og:url" content="https://eagle3440.github.io/scripture-pursuit/" />
   <meta property="og:type" content="website" />
 
-  <link rel="stylesheet" href="styles.css?v=42">
+  <link rel="stylesheet" href="styles.css?v=43">
   <script src="https://cdn.jsdelivr.net/npm/gameanalytics@4.0.0/umd/gameanalytics.min.js"></script>
 </head>
 <body>
@@ -197,7 +197,7 @@
             </div>
             <div id="led-ticker-line2" class="led-ticker-line">
               <span id="led-ticker-msg2" class="led-ticker-msg"></span>
-              <span id="led-ticker-launching" class="led-ticker-msg launching hidden" aria-hidden="true">LAUNCHING</span>
+              <span id="led-ticker-launching" class="led-ticker-msg launching hidden" aria-hidden="true"><span>L</span><span>A</span><span>U</span><span>N</span><span>C</span><span>H</span><span>I</span><span>N</span><span>G</span></span>
             </div>
           </div>
         </div>
@@ -495,10 +495,12 @@
       if (msg) { msg.classList.remove('warn-out'); msg.classList.add('warn'); }
       ledTickerLine1.start(LED_TICKER_LAUNCH_STEPS, { loop: true });
       playSound('photo-finish');
-      // Line 2: freeze weather/news mid-scroll and show LAUNCHING under the
-      // alert. Same on phone and desktop — line 2 exists on both.
+      // Line 2: freeze weather/news mid-scroll, hide it, and show LAUNCHING
+      // under the alert. Same on phone and desktop — line 2 exists on both.
       line2Launching = true;
       ledTickerLine2.pause();
+      const msg2 = document.getElementById('led-ticker-msg2');
+      if (msg2) msg2.style.visibility = 'hidden';
       const ov = document.getElementById('led-ticker-launching');
       if (ov) {
         ov.classList.remove('hidden', 'launch-hide');
@@ -527,6 +529,8 @@
         line2Launching = false;
         if (!titleTickerReady) return; // game started meanwhile — stay stopped
         ledTickerLine1.start(LED_TICKER_LINE1_STEPS, { loop: true });
+        const m2 = document.getElementById('led-ticker-msg2');
+        if (m2) m2.style.visibility = 'visible';
         ledTickerLine2.resume();
       }, 650);
     }
@@ -2002,6 +2006,8 @@
       if (lm) lm.classList.remove('warn', 'warn-out');
       const lo = document.getElementById('led-ticker-launching');
       if (lo) { lo.classList.add('hidden'); lo.classList.remove('launch-show', 'launch-hide'); }
+      const lm2 = document.getElementById('led-ticker-msg2');
+      if (lm2) lm2.style.visibility = '';
       line2Launching = false;
       ledTickerLine1.start(LED_TICKER_LINE1_STEPS, { loop: true });
       ledTickerLine2.start(buildLine2Steps(), { loop: true, regenerate: buildLine2Steps });

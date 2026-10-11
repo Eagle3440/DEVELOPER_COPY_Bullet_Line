@@ -288,18 +288,36 @@
        as the restart button. */
     /* Line-2 LAUNCHING overlay (2026-10-10): shown under the amber alert
        while a title video launches; weather/news stay paused underneath and
-       resume where they froze. Reuses the warning fade/pulse keyframes. */
+       resume where they froze. Letters ignite L→R like the old title-picture
+       ignition, then hold lit until the alert ends. */
     .led-ticker-msg.launching {
       left: 50%;
       transform: translateX(-50%);
-      color: #ffb000;
-      text-shadow: 0 0 8px rgba(255, 176, 0, 0.7);
     }
-    .led-ticker-msg.launching.launch-show {
-      animation: ledWarnIn 0.7s ease both, ledWarnPulse 1.6s ease-in-out 0.7s infinite;
+    .led-ticker-msg.launching span {
+      display: inline-block;
+      color: #5e3a06;
+      text-shadow: none;
     }
+    .led-ticker-msg.launching.launch-show span {
+      animation: line2LaunchIgnite 3s linear 1 both;
+    }
+    .led-ticker-msg.launching.launch-show span:nth-child(1) { animation-delay: 0s; }
+    .led-ticker-msg.launching.launch-show span:nth-child(2) { animation-delay: 0.26s; }
+    .led-ticker-msg.launching.launch-show span:nth-child(3) { animation-delay: 0.52s; }
+    .led-ticker-msg.launching.launch-show span:nth-child(4) { animation-delay: 0.78s; }
+    .led-ticker-msg.launching.launch-show span:nth-child(5) { animation-delay: 1.04s; }
+    .led-ticker-msg.launching.launch-show span:nth-child(6) { animation-delay: 1.3s; }
+    .led-ticker-msg.launching.launch-show span:nth-child(7) { animation-delay: 1.56s; }
+    .led-ticker-msg.launching.launch-show span:nth-child(8) { animation-delay: 1.82s; }
+    .led-ticker-msg.launching.launch-show span:nth-child(9) { animation-delay: 2.08s; }
     .led-ticker-msg.launching.launch-hide {
       animation: ledWarnOut 0.6s ease both;
+    }
+    @keyframes line2LaunchIgnite {
+      0% { color: #5e3a06; text-shadow: none; }
+      9% { color: #ffb000; text-shadow: 0 0 8px rgba(255, 176, 0, 0.7), 0 0 18px rgba(255, 176, 0, 0.45); }
+      100% { color: #ffb000; text-shadow: 0 0 8px rgba(255, 176, 0, 0.7), 0 0 18px rgba(255, 176, 0, 0.45); }
     }
 
     .train-logo-wrapper.run-chase {
