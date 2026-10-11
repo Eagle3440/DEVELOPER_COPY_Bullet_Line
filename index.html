@@ -31,7 +31,7 @@
   <meta property="og:url" content="https://eagle3440.github.io/scripture-pursuit/" />
   <meta property="og:type" content="website" />
 
-  <link rel="stylesheet" href="styles.css?v=41">
+  <link rel="stylesheet" href="styles.css?v=42">
   <script src="https://cdn.jsdelivr.net/npm/gameanalytics@4.0.0/umd/gameanalytics.min.js"></script>
 </head>
 <body>
@@ -130,7 +130,6 @@
         <video id="title-intro-video" class="title-intro-video" src="title-intro.mp4" muted playsinline preload="auto" aria-label="Title intro video"></video>
         <div id="title-fade-veil" class="title-fade-veil" aria-hidden="true"></div>
         <button id="title-intro-replay" class="title-intro-replay" type="button" aria-label="Replay intro video" title="Replay intro video">&#8635;</button>
-        <div id="title-launching" class="title-launching hidden" aria-hidden="true"><span>L</span><span>A</span><span>U</span><span>N</span><span>C</span><span>H</span><span>I</span><span>N</span><span>G</span></div>
         <div class="status-bar">
           <div>TREASURY: <span id="bank-val" class="bank-text">0 Shekels</span><span id="combo-val" class="combo-text"></span></div>
           <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;">
@@ -198,6 +197,7 @@
             </div>
             <div id="led-ticker-line2" class="led-ticker-line">
               <span id="led-ticker-msg2" class="led-ticker-msg"></span>
+              <span id="led-ticker-launching" class="led-ticker-msg launching hidden" aria-hidden="true">LAUNCHING</span>
             </div>
           </div>
         </div>
@@ -451,13 +451,11 @@
       return phone ? `NOW: ${curDest}` : `NOW SHOWING: ${curDest}`;
     }
     const TITLE_INTRO_REPLAY_MS = 2 * 60 * 1000;
-    const TITLE_LAUNCHING_MS = 3000; // LAUNCHING shows this long before the video
-    const TITLE_WARNING_LEAD_MS = 3000; // warning shows this long before LAUNCHING
+    const TITLE_WARNING_LEAD_MS = 3000; // warning shows this long before the video
     const TITLE_FADE_IN_MS = 500; // video -> black
     const TITLE_FADE_OUT_MS = 600; // black -> title picture
     let titleIntroTimer = null;
     let titleIntroScheduledAt = null; // Date.now() when the 2-min replay timer was set; feeds the ticker's departure countdown
-    let titleLaunchingTimer = null;
     let titleFadeTimer1 = null;
     let titleFadeTimer2 = null;
     let titleWarningTimer = null;
@@ -486,6 +484,10 @@
     // The warning appears centered and static (no scroll-in), fades in and
     // pulses like a warning beacon, and plays a single warning alarm.
     let titleRestoreTimer = null;
+    // True while the LAUNCHING overlay owns ticker line 2 (weather/news are
+    // paused underneath). Guards the hover-resume so it can't un-pause line 2
+    // mid-alert.
+    let line2Launching = false;
     function showTitleLaunchWarning() {
       if (!titleTickerReady) return;
       if (titleRestoreTimer) { clearTimeout(titleRestoreTimer); titleRestoreTimer = null; }
@@ -493,52 +495,43 @@
       if (msg) { msg.classList.remove('warn-out'); msg.classList.add('warn'); }
       ledTickerLine1.start(LED_TICKER_LAUNCH_STEPS, { loop: true });
       playSound('photo-finish');
+      // Line 2: freeze weather/news mid-scroll and show LAUNCHING under the
+      // alert. Same on phone and desktop — line 2 exists on both.
+      line2Launching = true;
+      ledTickerLine2.pause();
+      const ov = document.getElementById('led-ticker-launching');
+      if (ov) {
+        ov.classList.remove('hidden', 'launch-hide');
+        void ov.offsetWidth; // reflow so the fade-in restarts clean
+        ov.classList.add('launch-show');
+      }
     }
     function restoreTickerLine1() {
       if (titleRestoreTimer) { clearTimeout(titleRestoreTimer); titleRestoreTimer = null; }
       const msg = document.getElementById('led-ticker-msg');
       if (msg) { msg.classList.remove('warn'); msg.classList.add('warn-out'); }
-      // Fade the warning out first, then hand line 1 back to the welcome loop.
+      // Line 2: fade the LAUNCHING overlay out too.
+      const ov = document.getElementById('led-ticker-launching');
+      if (line2Launching && ov) {
+        ov.classList.remove('launch-show');
+        ov.classList.add('launch-hide');
+      }
+      // Fade the warning out first, then hand both lines back. Line 2 resumes
+      // exactly where it froze (pause/resume keeps the step and position).
       titleRestoreTimer = setTimeout(() => {
         titleRestoreTimer = null;
         const m = document.getElementById('led-ticker-msg');
         if (m) m.classList.remove('warn-out');
+        const o = document.getElementById('led-ticker-launching');
+        if (o) { o.classList.add('hidden'); o.classList.remove('launch-hide'); }
+        line2Launching = false;
         if (!titleTickerReady) return; // game started meanwhile — stay stopped
         ledTickerLine1.start(LED_TICKER_LINE1_STEPS, { loop: true });
+        ledTickerLine2.resume();
       }, 650);
-    }
-    function hideTitleLaunching() {
-      if (titleLaunchingTimer) { clearTimeout(titleLaunchingTimer); titleLaunchingTimer = null; }
-      const lw = document.getElementById('title-launching');
-      if (lw) {
-        lw.classList.add('hidden');
-        lw.querySelectorAll('span').forEach((sp) => sp.classList.remove('lit'));
-      }
     }
     function isPhoneWidth() {
       return window.matchMedia('(max-width: 767px)').matches;
-    }
-    // LAUNCHING ignition on the title picture before an automatic rotation
-    // video (desktop only — phone plays immediately). Letters light up L→R
-    // across the 3 seconds, one pass; done() fires when the video starts.
-    function runTitleLaunching(done) {
-      const lw = document.getElementById('title-launching');
-      if (!lw || isPhoneWidth()) { done(); return; }
-      hideTitleLaunching(); // reset any previous run
-      const letters = lw.querySelectorAll('span');
-      lw.classList.remove('hidden');
-      void lw.offsetWidth; // reflow so the ignition restarts clean
-      letters.forEach((sp) => sp.classList.add('lit'));
-      titleLaunchingTimer = setTimeout(() => {
-        titleLaunchingTimer = null;
-        // Game started mid-launch: bail out, never play over a game.
-        if (document.getElementById('start-game-btn').classList.contains('hidden')) {
-          hideTitleLaunching();
-          return;
-        }
-        hideTitleLaunching();
-        done();
-      }, TITLE_LAUNCHING_MS);
     }
     function scheduleTitleIntroReplay() {
       clearTitleIntroTimer();
@@ -604,18 +597,17 @@
     }
     function playTitlePlaylistIndex(i, withCountdown) {
       titlePlaylistIdx = i;
-      hideTitleLaunching(); // a new play cancels any running launch word
       clearTitleWarningTimer();
       clearTitleFadeTimers(); // a new play cancels any running fade
       snapTitleVeil();
       if (withCountdown) {
-        // Warning first, then LAUNCHING, then the video.
+        // Warning on line 1 + LAUNCHING on line 2, then the video.
         showTitleLaunchWarning();
         cutTitleWeatherMusic();
         titleWarningTimer = setTimeout(() => {
           titleWarningTimer = null;
           if (document.getElementById('start-game-btn').classList.contains('hidden')) return;
-          runTitleLaunching(() => playTitleVideo(TITLE_PLAYLIST[i]));
+          playTitleVideo(TITLE_PLAYLIST[i]);
         }, TITLE_WARNING_LEAD_MS);
       } else {
         showTitleLaunchWarning();
@@ -629,7 +621,6 @@
       clearTitleWarningTimer();
       clearTitleFadeTimers();
       snapTitleVeil();
-      hideTitleLaunching();
       restoreTickerLine1();
       introVideoPlaying = false;
       const iv = document.getElementById('title-intro-video');
@@ -1992,7 +1983,9 @@
     });
     ledTickerEl.addEventListener('mouseleave', () => {
       ledTickerLine1.resume();
-      ledTickerLine2.resume();
+      // Don't un-pause line 2 while the LAUNCHING overlay owns it — the
+      // alert's own restore hands it back.
+      if (!line2Launching) ledTickerLine2.resume();
       const weatherMusic = document.getElementById('weather-music-audio');
       // Respect the mute toggle: never restart the music while muted (the
       // button shows red/muted, so a restart here looked like mute failing).
@@ -2007,6 +2000,9 @@
       if (titleRestoreTimer) { clearTimeout(titleRestoreTimer); titleRestoreTimer = null; }
       const lm = document.getElementById('led-ticker-msg');
       if (lm) lm.classList.remove('warn', 'warn-out');
+      const lo = document.getElementById('led-ticker-launching');
+      if (lo) { lo.classList.add('hidden'); lo.classList.remove('launch-show', 'launch-hide'); }
+      line2Launching = false;
       ledTickerLine1.start(LED_TICKER_LINE1_STEPS, { loop: true });
       ledTickerLine2.start(buildLine2Steps(), { loop: true, regenerate: buildLine2Steps });
     }

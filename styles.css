@@ -286,43 +286,20 @@
     /* 3-2-1 countdown before each automatic rotation video (2026-10-06):
        bottom-left of the title picture, desktop only. Same 34px circle
        as the restart button. */
-    /* LAUNCHING ignition — small, bottom-left where the 3-2-1 circle sat.
-       Desktop only (hidden on phone like the countdown was). Letters light
-       up L→R across the 3 seconds, one pass per showing. */
-    .title-launching {
-      position: absolute;
-      left: 8px;
-      bottom: 8px;
-      z-index: 4;
-      font-family: 'Orbitron', 'Montserrat', sans-serif;
-      font-size: 14px;
-      font-weight: 900;
-      letter-spacing: 0.08em;
-      line-height: 1;
-      white-space: nowrap;
-      color: #6e4002;
-      background: rgba(10, 20, 36, 0.55);
-      border: 1px solid rgba(255, 178, 51, 0.45);
-      border-radius: 6px;
-      box-shadow: 0 0 10px rgba(255, 178, 51, 0.18);
-      padding: 6px 10px 6px 11px;
-      pointer-events: none;
+    /* Line-2 LAUNCHING overlay (2026-10-10): shown under the amber alert
+       while a title video launches; weather/news stay paused underneath and
+       resume where they froze. Reuses the warning fade/pulse keyframes. */
+    .led-ticker-msg.launching {
+      left: 50%;
+      transform: translateX(-50%);
+      color: #ffb000;
+      text-shadow: 0 0 8px rgba(255, 176, 0, 0.7);
     }
-    .title-launching span { display: inline-block; }
-    .title-launching span.lit { animation: titleLaunchIgnite 3s linear 1 both; }
-    .title-launching span.lit:nth-child(1) { animation-delay: 0s; }
-    .title-launching span.lit:nth-child(2) { animation-delay: 0.26s; }
-    .title-launching span.lit:nth-child(3) { animation-delay: 0.52s; }
-    .title-launching span.lit:nth-child(4) { animation-delay: 0.78s; }
-    .title-launching span.lit:nth-child(5) { animation-delay: 1.04s; }
-    .title-launching span.lit:nth-child(6) { animation-delay: 1.3s; }
-    .title-launching span.lit:nth-child(7) { animation-delay: 1.56s; }
-    .title-launching span.lit:nth-child(8) { animation-delay: 1.82s; }
-    .title-launching span.lit:nth-child(9) { animation-delay: 2.08s; }
-    @keyframes titleLaunchIgnite {
-      0% { color: #6e4002; text-shadow: none; }
-      9% { color: #fff6d8; text-shadow: 0 0 10px #ffcf5e, 0 0 26px rgba(255, 178, 51, 0.8); }
-      100% { color: #fff6d8; text-shadow: 0 0 10px #ffcf5e, 0 0 26px rgba(255, 178, 51, 0.8); }
+    .led-ticker-msg.launching.launch-show {
+      animation: ledWarnIn 0.7s ease both, ledWarnPulse 1.6s ease-in-out 0.7s infinite;
+    }
+    .led-ticker-msg.launching.launch-hide {
+      animation: ledWarnOut 0.6s ease both;
     }
 
     .train-logo-wrapper.run-chase {
@@ -2558,12 +2535,6 @@
   .title-intro-replay {
     top: 8px;
     bottom: auto;
-  }
-
-  /* --- Title LAUNCHING (2026-10-08): desktop only — the bottom-left
-         corner holds the TREASURY marker on phone, so no launch word here. --- */
-  .title-launching {
-    display: none !important;
   }
 
   /* --- Learning Library header (2026-10-10): the 900-weight title ran
