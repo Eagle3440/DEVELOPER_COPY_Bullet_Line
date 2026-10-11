@@ -2566,29 +2566,36 @@
     display: none !important;
   }
 
-  /* --- Learning Library header (2026-10-09): center the LEARNING LIBRARY
-         title across the full header row on phone so it can't crowd the
-         ← BACK link. Back pinned left, card count pinned right. --- */
+  /* --- Learning Library header (2026-10-10): the 900-weight title ran
+         ~195px wide in a ~242px row and overlapped the pinned ← BACK link
+         and card count. Slim the title to 700 at 0.8rem and shrink
+         back/count to 0.7rem (measured 235px total: fits with air). --- */
   .library-head {
     position: relative;
     display: block;
     text-align: center;
   }
   .library-title {
-    font-size: 1.05rem;
-    letter-spacing: 1px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
   }
   .library-back {
     position: absolute;
     left: 0;
     top: 50%;
     transform: translateY(-50%);
+    font-size: 0.7rem;
+    min-width: 0;
   }
   .library-count {
     position: absolute;
     right: 0;
     top: 50%;
     transform: translateY(-50%);
+    font-size: 0.7rem;
+    min-width: 0;
   }
 
 }
