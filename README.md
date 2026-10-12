@@ -16,7 +16,7 @@
 * **The Ticket Store:** Spend your lifetime Total Treasury on five themed question packs -- each unlocking hundreds of additional KJV questions and a matching category-only way to play. See below for details.
 * **Procedural Web Audio API Sound Effects:** Sound effects and train ambient audio generated programmatically via JavaScript -- no audio assets required for gameplay. The title-screen weather music is embedded in the page.
 * **The Jerusalem Herald News Ticker:** A two-line LED marquee on the title screen delivers scrolling live weather from the Holy Land and a rotating feed of KJV-inspired "breaking news" headlines -- see below for details.
-* **Title Videos:** Ten cinematic clips play over the title-train picture on a two-minute rotation -- `title-intro.mp4` on page load (the opening scene always stays the same), then the other nine in a random order shuffled once per session, looping. Each launch is announced with an amber ticker warning naming the train's destination ("WARNING: BULLET LINE DEPARTING FOR THE SEA OF GALILEE") plus a LAUNCHING ignition (desktop only), and the ↻ button replays the intro anytime. See below for details.
+* **Title Videos:** Ten cinematic clips play over the title-train picture -- `title-intro.mp4` on page load (the opening scene always stays the same), then the other nine in a random order shuffled once per session, looping until all ten have played with a two-minute picture gap between videos. Each launch is announced with an amber ticker warning naming the train's destination ("WARNING: BULLET LINE DEPARTING FOR THE SEA OF GALILEE") plus a LAUNCHING ignition (desktop only), and the ↻ button replays the intro anytime. See below for details.
 * **Responsive & Immersive UI:** Features a custom neon train CSS layout, animated fog background, mobile-optimized scripture viewing drawers, and dynamic game statistics tracking.
 
 ---
@@ -54,16 +54,16 @@ Eight cinematic clips play over the title-train picture on the title screen:
 * `mount-ararat.mp4` -- Mount Ararat, where Noah's Ark came to rest (Genesis 8:4).
 * `jerusalem-tomb.mp4` -- Jerusalem, the empty tomb -- the stone rolled away, He is risen.
 
-They run on a rotation: the intro plays on load, then the title picture returns; every two minutes the next video in the session's shuffled order plays until all ten have played, then the loop starts over from the intro in that same shuffled order. The rotation runs the same on phone and desktop.
+They're shuffled once per session: the intro always plays first (the opening scene stays the same), then the other nine play in a random order drawn when the page loads. After the intro, the title picture returns; every two minutes the next video in that session's shuffled order plays until all ten have played, then the loop starts over from the intro in the same shuffled order. A new shuffle is drawn every time the page is loaded. It runs the same on phone and desktop.
 
 * The videos fill the title picture exactly, playing above it but below the treasury HUD, so your Shekels stay visible.
 * Video sound follows the sound switch -- the clips stay muted until you turn sound on.
 * Before each automatic video (except the first page-load intro), a **3-2-1 countdown** appears in a small circle in the bottom-left corner of the picture -- desktop only, since the phone's bottom-left corner holds the TREASURY marker.
 * **Ticker launch warning:** every video launch is announced on the news ticker -- line 1 clears and an amber warning appears, fading in and pulsing like a warning beacon until the video ends, naming where the bullet train is headed: `⚠ WARNING: BULLET LINE DEPARTING FOR THE SEA OF GALILEE ⚠` on desktop, or just the shortened destination like `SEA OF GALILEE` on phone. A single two-tone warning alarm sounds once when the warning appears (it follows the sound switch), and the weather music cuts out for the duration of the video, returning on its own afterward. When the video ends, the warning fades out and line 1 goes back to its normal welcome messages. The full launch sequence is: two-minute timer → warning + music cut → 3 seconds → 3-2-1 countdown → video.
-* The **↻ replay button** (bottom-right of the picture on desktop, top-right on phone) replays the intro at any time, which also restarts the rotation from the beginning.
-* **Background tabs go quiet:** if the tab is hidden (another tab, minimized window, or the browser closed but still running in the background), the game freezes its title-screen ambience -- the departures board, the video rotation, the tickers -- and silences all audio. Everything resumes exactly where it froze when you come back. Gameplay itself is untouched.
-* Starting a game stops the rotation; returning to the title screen restarts the two-minute countdown.
-* Deployment note: all eight `.mp4` files must sit in the same folder as `index.html`. If one is missing, the rotation skips it and moves on to the next.
+* The **↻ replay button** (bottom-right of the picture on desktop, top-right on phone) replays the intro at any time, which also restarts the shuffled sequence from the beginning.
+* **Background tabs go quiet:** if the tab is hidden (another tab, minimized window, or the browser closed but still running in the background), the game freezes its title-screen ambience -- the departures board, the shuffled video sequence, the tickers -- and silences all audio. Everything resumes exactly where it froze when you come back. Gameplay itself is untouched.
+* Starting a game stops the video sequence; returning to the title screen restarts the two-minute countdown.
+* Deployment note: all ten `.mp4` files must sit in the same folder as `index.html`. If one is missing, the sequence skips it and moves on to the next.
 
 ---
 
