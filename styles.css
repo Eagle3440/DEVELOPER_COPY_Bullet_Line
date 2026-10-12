@@ -2103,6 +2103,11 @@
     .opp-card img {
       width: 100%;
       height: auto;
+      /* Lock every opponent card to the same 2:3 box (2026-10-11): the card
+         art files drift a hair in aspect (0.6585 vs 0.6667), which rendered
+         one card a few pixels taller. This absorbs the difference invisibly
+         so all three always sit even, whatever the file dimensions. */
+      aspect-ratio: 2 / 3;
       display: block;
       border-radius: 8px;
     }
