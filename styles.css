@@ -2102,12 +2102,13 @@
     .rival-badge.first { border-color: #5a6b85; color: #9fb0c8; }
     .opp-card img {
       width: 100%;
-      height: auto;
       /* Lock every opponent card to the same 2:3 box (2026-10-11): the card
          art files drift a hair in aspect (0.6585 vs 0.6667), which rendered
-         one card a few pixels taller. This absorbs the difference invisibly
-         so all three always sit even, whatever the file dimensions. */
+         one card a few pixels taller. No height:auto here — with it present,
+         browsers can prefer the image's intrinsic ratio over this one.
+         object-fit:fill absorbs the ~1% difference invisibly (no crop). */
       aspect-ratio: 2 / 3;
+      object-fit: fill;
       display: block;
       border-radius: 8px;
     }
