@@ -228,6 +228,8 @@ A **FEEDBACK** link in the top navigation opens an in-page form for sending ques
 
 ## 📂 Project Structure
 
+Built with vanilla HTML5, CSS3, and JavaScript -- no frameworks, no build step.
+
 The project is organized into a handful of files rather than a single monolithic one, separating the question data and styling from the application logic:
 
 * `index.html` -- The core application: HTML structure, SVG graphics, audio synthesis logic, and game logic.
