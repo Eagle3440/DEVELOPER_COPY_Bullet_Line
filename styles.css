@@ -967,7 +967,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      gap: 116px;
+      gap: 132px;
       padding: 0 10px;
     }
     .chaser-text-badge.split-badge .split-side { color: #d43a3a; }
@@ -997,9 +997,9 @@
     }
     #coin-overlay .overlay-coin {
       position: absolute;
-      transform: translate(-50%, -50%);
-      width: 100px;
-      height: 100px;
+      transform: translate(-50%, -50%) scale(var(--coin-scale, 1));
+      width: 116px;
+      height: 116px;
     }
 
     /* Stall button under the question (original position). */
@@ -1616,8 +1616,8 @@
        The overlay centers each coin on its badge. */
     .tiebreak-tokens.coins-only { gap: 28px; flex-wrap: nowrap; }
     .tiebreak-tokens.coins-only .split-badge {
-      width: 100px;
-      height: 100px;
+      width: 116px;
+      height: 116px;
       flex: 0 0 auto;
       padding: 0;
       gap: 0;

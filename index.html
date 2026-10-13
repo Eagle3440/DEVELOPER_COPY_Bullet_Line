@@ -2106,6 +2106,7 @@
       verseTimerBadge.classList.add('hidden');
       verseContainer.classList.add('hidden');
       document.getElementById('board-container')?.classList.remove('verses-up');
+      positionCoinOverlay();
     }
 
     function toggleChaseVersePause() {
@@ -2156,6 +2157,7 @@
         verseTextEl.textContent = questionObj.text ? `“${questionObj.text}”` : "--";
         verseContainer.classList.remove('hidden');
         document.getElementById('board-container')?.classList.add('verses-up'); // coins only while the verse is up
+        positionCoinOverlay();
         
         isChaseVersePaused = false;
         const pauseBtn = document.getElementById('verse-chase-pause-btn');
@@ -2742,6 +2744,12 @@
     // Coins live in a board-level overlay (above every step) so a big coin can
     // never slide under a neighboring row or the verse panel. Each badge's
     // data-coin names its artwork; the coin centers on its badge.
+    const COIN_VISUAL_SCALE = {
+      'coin-bullet-line.png': 1,
+      'coin-trainx-prophet.png': 1.093,
+      'coin-trainx-disciple.png': 1.058,
+      'coin-trainx-scholar.png': 1.051
+    };
     function positionCoinOverlay() {
       const board = document.getElementById('board-container');
       if (!board) return;
@@ -2755,12 +2763,19 @@
       const br = board.getBoundingClientRect();
       if (!br.width) return; // layout not ready (or headless test)
       board.querySelectorAll('.split-badge[data-coin]').forEach(badge => {
-        const r = badge.getBoundingClientRect();
+        // While the verse is up the name text is hidden, so center the coin
+        // in the whole step row; otherwise stay on the badge (text area).
+        const target = (board.classList.contains('verses-up') && badge.closest('.step')) || badge;
+        const r = target.getBoundingClientRect();
         if (!r.width) return;
         const img = document.createElement('img');
         img.className = 'overlay-coin';
         img.src = badge.dataset.coin;
         img.alt = '';
+        // The Train X artwork has more transparent padding than the Bullet
+        // Line coin, so at the same CSS size it looks smaller. Scale each
+        // coin so its visible rim matches Bullet Line's.
+        img.style.setProperty('--coin-scale', COIN_VISUAL_SCALE[badge.dataset.coin.split('?')[0]] || 1);
         img.style.left = (r.left - br.left + r.width / 2) + 'px';
         img.style.top = (r.top - br.top + r.height / 2) + 'px';
         ov.appendChild(img);
