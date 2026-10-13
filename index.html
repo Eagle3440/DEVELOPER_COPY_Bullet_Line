@@ -31,7 +31,7 @@
   <meta property="og:url" content="https://eagle3440.github.io/scripture-pursuit/" />
   <meta property="og:type" content="website" />
 
-  <link rel="stylesheet" href="styles.css?v=45">
+  <link rel="stylesheet" href="styles.css?v=62">
   <script src="https://cdn.jsdelivr.net/npm/gameanalytics@4.0.0/umd/gameanalytics.min.js"></script>
 </head>
 <body>
@@ -2105,6 +2105,7 @@
       if (pauseBtn) pauseBtn.textContent = 'Pause';
       verseTimerBadge.classList.add('hidden');
       verseContainer.classList.add('hidden');
+      document.getElementById('board-container')?.classList.remove('verses-up');
     }
 
     function toggleChaseVersePause() {
@@ -2154,6 +2155,7 @@
         verseRefEl.textContent = questionObj.ref ? `${questionObj.ref} (KJV)` : "--";
         verseTextEl.textContent = questionObj.text ? `“${questionObj.text}”` : "--";
         verseContainer.classList.remove('hidden');
+        document.getElementById('board-container')?.classList.add('verses-up'); // coins only while the verse is up
         
         isChaseVersePaused = false;
         const pauseBtn = document.getElementById('verse-chase-pause-btn');
@@ -2164,6 +2166,7 @@
         startChaseVerseCountdown(totalDuration);
       } else {
         verseContainer.classList.add('hidden');
+        document.getElementById('board-container')?.classList.remove('verses-up');
       }
     }
 
@@ -2716,21 +2719,66 @@
           // Victory: Train X clears the board entirely.
           if (s === trainXPos && !isVictory) {
             const c = document.createElement('div');
-            c.className = 'chaser-text-badge'; c.innerHTML = TRAIN_X_ICON + '<span>TRAIN X &middot; ' + chosenOpponent.name + '</span>';
+            c.className = 'chaser-text-badge split-badge'; c.dataset.coin = 'coin-trainx-' + chosenOpponent.id + '.png?v=3'; c.innerHTML = '<span class="split-side">TRAIN X</span><span class="split-side">' + chosenOpponent.name + '</span>';
             dSlot.appendChild(c);
           }
           if (s === playerPos && !isTrainXWin) {
             const p = document.createElement('div');
-            p.className = 'player-token'; p.innerHTML = BULLET_LINE_ICON + '<span>BULLET LINE</span>';
+            p.className = 'player-token split-badge'; p.dataset.coin = 'coin-bullet-line.png?v=3'; p.innerHTML = '<span class="split-side">BULLET</span><span class="split-side">LINE</span>';
             bSlot.appendChild(p);
           }
         }
+        // Coins paint from the board-level overlay now (always on top), so no
+        // per-row z-index juggling is needed.
       }
 
       const s0 = document.getElementById('slot-0');
       s0.innerHTML = '';
       s0.classList.remove('victory-state');
       // Winner badge removed — the board collapses straight into the end video.
+      positionCoinOverlay();
+    }
+
+    // Coins live in a board-level overlay (above every step) so a big coin can
+    // never slide under a neighboring row or the verse panel. Each badge's
+    // data-coin names its artwork; the coin centers on its badge.
+    function positionCoinOverlay() {
+      const board = document.getElementById('board-container');
+      if (!board) return;
+      let ov = document.getElementById('coin-overlay');
+      if (!ov) {
+        ov = document.createElement('div');
+        ov.id = 'coin-overlay';
+        board.appendChild(ov);
+      }
+      ov.innerHTML = '';
+      const br = board.getBoundingClientRect();
+      if (!br.width) return; // layout not ready (or headless test)
+      board.querySelectorAll('.split-badge[data-coin]').forEach(badge => {
+        const r = badge.getBoundingClientRect();
+        if (!r.width) return;
+        const img = document.createElement('img');
+        img.className = 'overlay-coin';
+        img.src = badge.dataset.coin;
+        img.alt = '';
+        img.style.left = (r.left - br.left + r.width / 2) + 'px';
+        img.style.top = (r.top - br.top + r.height / 2) + 'px';
+        ov.appendChild(img);
+      });
+    }
+    let coinOverlayResizeT = null;
+    window.addEventListener('resize', () => {
+      clearTimeout(coinOverlayResizeT);
+      coinOverlayResizeT = setTimeout(positionCoinOverlay, 150);
+    });
+    // The verse panel opening/closing resizes the board — keep coins glued
+    // to their badges through any board geometry change.
+    if (window.ResizeObserver) {
+      const boardEl = document.getElementById('board-container');
+      if (boardEl) new ResizeObserver(() => {
+        clearTimeout(coinOverlayResizeT);
+        coinOverlayResizeT = setTimeout(positionCoinOverlay, 60);
+      }).observe(boardEl);
     }
 
     // End-of-race cinematic: steps collapse 7→1 on both sides, the winner/loser
@@ -2750,6 +2798,8 @@
 
     function playEndSequence(isWin) {
       clearEndSeqTimers();
+      const cov = document.getElementById('coin-overlay');
+      if (cov) cov.style.display = 'none'; // coins bow out before the collapse
       if (!isWin) clearRaceBanners();
       const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       const stepDelay = reduceMotion ? 0 : 350;
@@ -2845,6 +2895,8 @@
 
     function resetEndSequence() {
       clearEndSeqTimers();
+      const cov = document.getElementById('coin-overlay');
+      if (cov) { cov.style.display = ''; cov.innerHTML = ''; }
       document.querySelectorAll('#board-container .step').forEach(el => el.classList.remove('step-collapsed'));
       document.querySelectorAll('#board-container .step-row').forEach(r => r.classList.remove('hidden'));
       document.getElementById('slot-0')?.classList.remove('step-collapsed');
@@ -3080,10 +3132,11 @@
       const s0 = document.getElementById('slot-0');
       s0.innerHTML = '';
       const tb = document.createElement('div');
-      tb.className = 'tiebreak-tokens';
-      tb.innerHTML = `<div class="chaser-text-badge">${TRAIN_X_ICON}<span>TRAIN X &middot; ${chosenOpponent.name}</span></div>` +
-                     `<div class="player-token">${BULLET_LINE_ICON}<span>BULLET LINE</span></div>`;
+      tb.className = 'tiebreak-tokens coins-only';
+      tb.innerHTML = `<div class="chaser-text-badge split-badge" data-coin="coin-trainx-${chosenOpponent.id}.png?v=3"></div>` +
+                     `<div class="player-token split-badge" data-coin="coin-bullet-line.png?v=3"></div>`;
       s0.appendChild(tb);
+      positionCoinOverlay();
       activeQuestion = getNextUniqueQuestion();
       activeQuestion.difficulty = 'medium';
       diffIndicator.classList.remove('hidden', 'diff-easy', 'diff-hard');

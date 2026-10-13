@@ -527,6 +527,7 @@
       background: rgba(8, 14, 25, 0.88);
       backdrop-filter: blur(20px);
       flex: 1;
+      min-width: 0;
       border-radius: 16px;
       padding: 24px;
       box-shadow: 0 20px 50px rgba(0,0,0,0.9), inset 0 0 2px rgba(0, 180, 255, 0.3);
@@ -540,6 +541,7 @@
 
     .verse-side-panel {
       flex: 1;
+      min-width: 0;
       background: rgba(12, 22, 36, 0.95);
       backdrop-filter: blur(20px);
       border: 1.5px solid rgba(212, 175, 55, 0.45);
@@ -755,13 +757,14 @@
 
     .board-container {
       width: 100%;
+      position: relative;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 6px;
       margin-bottom: 20px;
       background: linear-gradient(180deg, #050a12 0%, #0b1424 100%);
-      padding: 18px 10px;
+      padding: 34px 10px 18px;
       border-radius: 12px;
       border: 1.5px solid rgba(0, 210, 255, 0.3);
       box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8), 0 10px 25px rgba(0, 0, 0, 0.5);
@@ -882,9 +885,10 @@
       z-index: 2;
     }
 
-    .token-space { 
-      display: flex; 
-      gap: 5px; 
+    .token-space {
+      position: relative;
+      display: flex;
+      gap: 5px;
       align-items: center;
       justify-content: flex-end;
       flex: 1 1 auto;
@@ -949,6 +953,53 @@
       color: #ffffff; 
       box-shadow: 0 0 12px rgba(0, 210, 255, 0.7), inset 0 0 8px rgba(255, 255, 255, 0.5); 
       border: 1.5px solid #80dfff;
+    }
+
+    /* Split-text badge (2026-10-12): no pill — the TEXT carries the color:
+       dark red for Train X, dark blue for Bullet Line. Text split around
+       the middle where the coin floats. The coin itself paints from
+       #coin-overlay, a board-level layer above every step, so a big coin
+       can never slide under a neighboring row or the verse panel. */
+    .chaser-text-badge.split-badge, .player-token.split-badge {
+      background: none;
+      border: none;
+      box-shadow: none;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 116px;
+      padding: 0 10px;
+    }
+    .chaser-text-badge.split-badge .split-side { color: #d43a3a; }
+    .player-token.split-badge .split-side { color: #3a7bd5; }
+    .split-side {
+      flex: 1 1 0;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-size: 0.85rem;
+      font-weight: 900;
+      letter-spacing: 1px;
+      white-space: nowrap;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+    }
+    /* Equal halves, text hugging the center gap — the gap always lands dead
+       center under the coin, so the coin can never eat a word ending. */
+    .split-badge .split-side:first-child { text-align: right; }
+    .split-badge .split-side:last-child { text-align: left; }
+    /* While the verse panel is up: text hides, but the colored badges stay. */
+    #board-container.verses-up .split-side { visibility: hidden; }
+    #coin-overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 60;
+    }
+    #coin-overlay .overlay-coin {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      width: 100px;
+      height: 100px;
     }
 
     /* Stall button under the question (original position). */
@@ -1560,6 +1611,19 @@
       justify-content: center;
       align-items: center;
       flex-wrap: wrap;
+    }
+    /* Photo finish: the two coins side by side, centered, no text (his call).
+       The overlay centers each coin on its badge. */
+    .tiebreak-tokens.coins-only { gap: 28px; flex-wrap: nowrap; }
+    .tiebreak-tokens.coins-only .split-badge {
+      width: 100px;
+      height: 100px;
+      flex: 0 0 auto;
+      padding: 0;
+      gap: 0;
+      background: none;
+      border: none;
+      box-shadow: none;
     }
 
     .summary-score-banner {
@@ -2448,6 +2512,14 @@
 
   /* --- Race tokens: smaller labels so names stop truncating --- */
   .chaser-text-badge, .player-token { font-size: 0.6rem; letter-spacing: 0; }
+
+  /* --- Split-text badge: smaller coin on phones --- */
+  #coin-overlay .overlay-coin { width: 74px; height: 74px; }
+  .chaser-text-badge.split-badge, .player-token.split-badge { padding: 0 6px; gap: 84px; }
+  .split-side { font-size: 0.65rem; }
+  /* Photo finish coins match the smaller phone coin. */
+  .tiebreak-tokens.coins-only { gap: 20px; }
+  .tiebreak-tokens.coins-only .split-badge { width: 74px; height: 74px; }
 
   /* --- Footers: drop the blur on phones (2026-10-05). The backdrop-filter
          made the footer's background repaint slower than its text while
