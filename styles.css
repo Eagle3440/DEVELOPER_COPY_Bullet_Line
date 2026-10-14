@@ -2489,10 +2489,14 @@
 
   /* --- Departures board: stop TIME/TRK/STATUS columns colliding --- */
   .ticker-board { padding: 12px; }
+  /* Start-screen fit fix is DESKTOP-ONLY (Bill's call, 2026-10-13): restore
+     the pre-fix spacing on phones so the phone layout stays untouched. */
+  .ticker-header { padding-bottom: 10px; margin-bottom: 12px; }
+  .card-container { padding-bottom: 24px; }
   .ticker-title { font-size: 13px; letter-spacing: 1px; }
   .ticker-clock { font-size: 12px; }
   .ticker-column-headers { font-size: 8px; letter-spacing: 0; }
-  .ticker-caption { font-size: 9px; }
+  .ticker-caption { font-size: 9px; margin: -4px 0 10px 2px; }
   .ticker-cell { height: 15px; }
   .ticker-cell span { font-size: 9px; }
 
