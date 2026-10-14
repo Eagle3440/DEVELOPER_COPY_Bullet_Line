@@ -31,7 +31,7 @@
   <meta property="og:url" content="https://eagle3440.github.io/scripture-pursuit/" />
   <meta property="og:type" content="website" />
 
-  <link rel="stylesheet" href="styles.css?v=62">
+  <link rel="stylesheet" href="styles.css?v=63">
   <script src="https://cdn.jsdelivr.net/npm/gameanalytics@4.0.0/umd/gameanalytics.min.js"></script>
 </head>
 <body>
@@ -49,13 +49,14 @@
   <div id="disclaimer-footer">
     <div class="footer-row">
       <a href="readme.html" target="_blank">HOW TO PLAY</a>
-      <a id="feedback-link" onclick="openFeedbackModal()">FEEDBACK</a>
+      <a href="story.html" target="_blank">STORY</a>
       <span class="buy-ticket-wrap">
         <a href="store.html" class="buy-ticket-link" onclick="dismissTicketGlow()">BUY TICKET</a>
         <svg class="ticket-glow-svg" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false">
           <rect class="ticket-glow-rect" x="2" y="2" width="96" height="96" rx="14" ry="14" pathLength="100"></rect>
         </svg>
       </span>
+      <a id="feedback-link" onclick="openFeedbackModal()">FEEDBACK</a>
       <a href="terms.html" target="_blank">TERMS</a>
       <a href="license.html" target="_blank">LICENSE</a>
     </div>
@@ -1274,7 +1275,85 @@
       return testament === 'NT' ? 'epistles' : 'kings';
     }
 
+    // --- Question levels (2026-10-13, tagger v2 — Bill approved) -----------
+    // Every question gets an easy/medium/hard level, computed at load from
+    // the bank itself (questions.json is never modified). Two signals:
+    // 45% wording — bigram Dice similarity between the correct answer and
+    // its three wrong options (near-identical options read harder);
+    // 55% fame — how often the question's subject words (the correct
+    // answer's words count most) appear across the whole bank's questions
+    // and verse texts (famous subjects read easier, obscure ones harder).
+    // The combined score is split into thirds: 333 easy / 334 medium /
+    // 334 hard. The level lives in its own field and is used ONLY to deal
+    // questions (see the exact-25 slot cycle below) — it is never fed into
+    // Train X's accuracy math.
+    function bigramDiceSimilarity(a, b) {
+      a = a.toLowerCase(); b = b.toLowerCase();
+      if (a === b) return 1.0;
+      if (a.length < 2 || b.length < 2) return 0.0;
+      const counts = new Map();
+      for (let i = 0; i < a.length - 1; i++) {
+        const g = a.slice(i, i + 2);
+        counts.set(g, (counts.get(g) || 0) + 1);
+      }
+      let inter = 0;
+      for (let i = 0; i < b.length - 1; i++) {
+        const g = b.slice(i, i + 2);
+        const left = counts.get(g) || 0;
+        if (left > 0) { inter++; counts.set(g, left - 1); }
+      }
+      return 2 * inter / ((a.length - 1) + (b.length - 1));
+    }
+
+    function computeQuestionLevels(rawItems) {
+      const N = rawItems.length;
+      if (!N) return [];
+      // Signal 1: wording confusability.
+      const wording = rawItems.map(item => {
+        const sims = item.d.map(d => bigramDiceSimilarity(item.a, d));
+        return sims.reduce((s, v) => s + v, 0) / sims.length;
+      });
+      // Signal 2: fame/obscurity — document frequency of subject words
+      // across the whole bank (question + answers + verse text + ref).
+      const tokenize = (text, pattern) => (String(text || '').toLowerCase().match(pattern) || []);
+      const DF = new Map();
+      rawItems.forEach(item => {
+        const blob = [item.q, item.a, ...(item.d || []), item.text || '', item.ref || ''].join(' ');
+        new Set(tokenize(blob, /[a-z0-9']+/g)).forEach(w => DF.set(w, (DF.get(w) || 0) + 1));
+      });
+      const STEM_STOP = new Set(['what', 'was', 'were', 'is', 'are', 'the', 'a', 'an', 'of', 'to', 'in', 'on', 'and', 'or', 'did', 'does', 'do', 'had', 'has', 'have', 'he', 'she', 'it', 'they', 'them', 'his', 'her', 'their', 'him', 'who', 'whom', 'which', 'when', 'where', 'why', 'how']);
+      const meanLogDF = (words) => {
+        const uniq = [...new Set(words)];
+        if (!uniq.length) return null;
+        return uniq.reduce((s, w) => s + Math.log1p(DF.get(w) || 0), 0) / uniq.length;
+      };
+      const fame = rawItems.map(item => {
+        const ansWords = tokenize(item.a, /[a-z0-9']+/g).filter(w => w.length >= 2 && !['the', 'a', 'an', 'of'].includes(w));
+        const stemWords = tokenize(item.q, /[a-z']+/g).filter(w => w.length >= 4 && !STEM_STOP.has(w));
+        const fa = meanLogDF(ansWords);
+        const fs = meanLogDF(stemWords);
+        if (fa === null) return fs === null ? 0 : fs;
+        if (fs === null) return fa;
+        return 0.7 * fa + 0.3 * fs;
+      });
+      // Percentile ranks for both signals (stable order, ties keep bank order).
+      const ranksOf = (vals) => {
+        const order = vals.map((v, i) => i).sort((x, y) => vals[x] - vals[y]);
+        const r = new Array(N);
+        order.forEach((idx, rank) => { r[idx] = rank / (N - 1); });
+        return r;
+      };
+      const rWording = ranksOf(wording);
+      const rObscurity = ranksOf(fame.map(f => -f));
+      const finalScores = rawItems.map((_, i) => 0.45 * rWording[i] + 0.55 * rObscurity[i]);
+      const sorted = [...finalScores].sort((x, y) => x - y);
+      const lo = sorted[Math.floor(N / 3)];
+      const hi = sorted[Math.floor(2 * N / 3)];
+      return finalScores.map(s => s < lo ? 'easy' : s < hi ? 'medium' : 'hard');
+    }
+
     function buildDeckFromPDF() {
+      const levelTags = computeQuestionLevels(pdfRawQuestions);
       return pdfRawQuestions.map((item, id) => {
         let options = [item.a, ...item.d];
         for (let i = options.length - 1; i > 0; i--) {
@@ -1290,6 +1369,7 @@
           id: id, q: item.q, options: options, ans: options.indexOf(item.a),
           ref: item.ref || "KJV Reference", text: item.text || "Scripture reference.", testament: testament,
           category: category,
+          level: levelTags[id],
           // "stock" questions are always free; "paid" ones require owning
           // this question's pack (see isQuestionAvailable / bulletline_owned_packs).
           tier: item.tier === 'paid' ? 'paid' : 'stock'
@@ -1434,27 +1514,91 @@
       });
     }
 
+    // --- Exact-25 level cycle (2026-10-13, Bill's plan) --------------------
+    // The number printed on each opponent card is the share of questions at
+    // that opponent's level, dealt in shuffled cycles of 25 slots:
+    //   Disciple 17 easy / 4 medium / 4 hard   = 68% easy
+    //   Scholar  3 easy / 19 medium / 3 hard   = 76% medium
+    //   Prophet  2 easy / 2 medium / 21 hard   = 84% hard
+    // 17/25, 19/25 and 21/25 are exact — no rounding. The slots are
+    // shuffled, so the minority levels slip in unsuspectingly. The cycle is
+    // rebuilt fresh each game (buildLevelSlots, called when a game starts).
+    // Each level has its own no-repeat pile inside the current pool: when a
+    // level's pile runs out, that level alone quietly reshuffles.
+    const OPPONENT_LEVEL_MIX = {
+      disciple: { easy: 17, medium: 4, hard: 4 },
+      scholar: { easy: 3, medium: 19, hard: 3 },
+      prophet: { easy: 2, medium: 2, hard: 21 }
+    };
+    // If a pool ever has no unused question of the slot's level, fall back
+    // to the closest level in the same pool — a draw can never stall.
+    const LEVEL_FALLBACK_ORDER = {
+      easy: ['easy', 'medium', 'hard'],
+      medium: ['medium', 'easy', 'hard'],
+      hard: ['hard', 'medium', 'easy']
+    };
+    let levelSlotQueue = [];
+
+    function buildLevelSlots() {
+      const mix = OPPONENT_LEVEL_MIX[chosenOpponent ? chosenOpponent.id : 'disciple']
+        || OPPONENT_LEVEL_MIX.disciple;
+      const slots = [];
+      Object.entries(mix).forEach(([level, count]) => {
+        for (let i = 0; i < count; i++) slots.push(level);
+      });
+      for (let i = slots.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [slots[i], slots[j]] = [slots[j], slots[i]];
+      }
+      levelSlotQueue = slots;
+    }
+
+    function drawQuestionOfLevel(level) {
+      let candidates = currentActiveDeck.filter(item => item.level === level && !usedQuestionIndices.has(item.id));
+      if (!candidates.length) {
+        // This level's pile in the current pool is played out: quietly
+        // reshuffle just that level's questions in this pool (other levels
+        // and other pools keep their no-repeat progress).
+        const pile = currentActiveDeck.filter(item => item.level === level);
+        if (!pile.length) return null;
+        pile.forEach(item => usedQuestionIndices.delete(item.id));
+        saveUsedQuestionIds();
+        candidates = pile;
+      }
+      const q = candidates[Math.floor(Math.random() * candidates.length)];
+      usedQuestionIndices.add(q.id);
+      saveUsedQuestionIds();
+      return q;
+    }
+
     function getNextUniqueQuestion() {
       if (currentActiveDeck.length === 0) {
-        const pool = getQuestionPool();
-        let available = pool.filter(item => !usedQuestionIndices.has(item.id));
-        if (available.length === 0) {
-          // Only clear used-ids belonging to this pool, so progress on
-          // other categories (or the full deck) isn't wiped out too.
-          pool.forEach(item => usedQuestionIndices.delete(item.id));
-          saveUsedQuestionIds();
-          available = [...pool];
-          const catLabel = activeCategoryFilter
-            ? (CATEGORY_META.find(c => c.id === activeCategoryFilter) || {}).label
-            : null;
-          const scopeText = catLabel ? `All ${pool.length} ${catLabel} questions` : `All ${pool.length} questions in the bank`;
-          document.getElementById('shuffle-modal-msg').textContent =
-            `${scopeText} have been played! The tracking history has been completely reshuffled for a fresh deck.`;
-          document.getElementById('shuffle-modal').classList.remove('hidden');
-        }
-        currentActiveDeck = [...available].sort(() => Math.random() - 0.5);
+        currentActiveDeck = getQuestionPool();
       }
-      const q = currentActiveDeck.pop();
+      if (!currentActiveDeck.length) return null;
+      if (!levelSlotQueue.length) buildLevelSlots();
+      const want = levelSlotQueue.shift();
+      for (const level of LEVEL_FALLBACK_ORDER[want]) {
+        const q = drawQuestionOfLevel(level);
+        if (q) return q;
+      }
+      return null;
+    }
+
+    // Sudden death stays a single neutral draw, exactly as before — it does
+    // not consume a slot from the level cycle and gets no level stacked on.
+    function getSuddenDeathQuestion() {
+      if (currentActiveDeck.length === 0) {
+        currentActiveDeck = getQuestionPool();
+      }
+      let available = currentActiveDeck.filter(item => !usedQuestionIndices.has(item.id));
+      if (!available.length && currentActiveDeck.length) {
+        currentActiveDeck.forEach(item => usedQuestionIndices.delete(item.id));
+        saveUsedQuestionIds();
+        available = [...currentActiveDeck];
+      }
+      if (!available.length) return null;
+      const q = available[Math.floor(Math.random() * available.length)];
       usedQuestionIndices.add(q.id);
       saveUsedQuestionIds();
       return q;
@@ -2290,6 +2434,7 @@
       setTimeout(() => disclaimerFooter.classList.add('hidden'), 300);
 
       currentActiveDeck = [];
+      buildLevelSlots();
       askedQuestionsLog = [];
       startGameBtn.classList.add('hidden');
       startRow.classList.add('hidden');
@@ -3152,7 +3297,7 @@
                      `<div class="player-token split-badge" data-coin="coin-bullet-line.png?v=3"></div>`;
       s0.appendChild(tb);
       positionCoinOverlay();
-      activeQuestion = getNextUniqueQuestion();
+      activeQuestion = getSuddenDeathQuestion();
       activeQuestion.difficulty = 'medium';
       diffIndicator.classList.remove('hidden', 'diff-easy', 'diff-hard');
       diffIndicator.classList.add('diff-medium');

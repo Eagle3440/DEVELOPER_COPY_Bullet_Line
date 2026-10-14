@@ -8,7 +8,7 @@
 
 * **KJV Scripture Integration:** Every trivia question is paired with a direct King James Bible reference and scripture quote to deepen your study and understanding of the Word.
 * **The Shekel Builder Round:** A fast-paced 60-second opening round where consecutive correct answers pay a rising combo ladder -- 1,000 -> 1,250 -> 1,500 -> 1,750 -> 2,000 Shekels of Silver. Five in a row banks 1 AUTO STALL + 1 AUTO ADVANCE and restarts the ladder; a miss resets it to 1,000.
-* **Choose Your Opponent:** After START GAME, pick your rival's smarts -- **Disciple** (68% accuracy, x1 win bonus), **Scholar** (76% accuracy, x1.25 win bonus), or **Prophet** (84% accuracy, x1.5 win bonus). Sharper mind, richer win. Your choice is remembered between visits.
+* **Choose Your Opponent:** After START GAME, pick your rival's smarts -- **Disciple** (68% accuracy, x1 win bonus), **Scholar** (76% accuracy, x1.25 win bonus), or **Prophet** (84% accuracy, x1.5 win bonus). Sharper mind, richer win. Your choice is remembered between visits. The number on the card also sets your questions: Disciple deals 68% Easy questions, Scholar 76% Medium, and Prophet 84% Hard (see Question Deck Shuffle Logic below).
 * **Head-to-Head Race Mechanics:** A 7-step sprint against the rival Train X -- you board at Step 5, 6, or 7 depending on the line you choose, and the first to reach the station (Step 0) wins. Correct answers advance your Bullet Line; Train X advances on its own hidden accuracy roll each round.
 * **Hazard Events:** Up to one Bible-themed track hazard per race (round 4 or later, never in sudden death) -- Bridge Out, the Red Sea, Daniel's Lions, the Fiery Furnace, and 10 more, drawn from a shuffled no-repeat deck. The race question doubles as your dodge test: answer correctly to dodge it, miss and you're knocked back a step.
 * **Rivalry Record:** Your lifetime win-loss record against each opponent is tracked and shown as a badge on their card (FIRST MEETING, gold when you're leading, red when trailing) and as a W-L card on every game summary.
@@ -195,10 +195,11 @@ The race isn't just you versus Train X -- the track itself fights back. A 14-car
 
 The game uses a **smart deck shuffling system** to ensure a fresh experience while preventing question fatigue:
 
+* **Question Levels:** Every question carries a hidden level -- Easy, Medium, or Hard -- calculated when the game loads, from how familiar its subject is across the whole question bank and how close its wrong answers are to the right one. About a third of the bank falls at each level.
+* **Opponent Level Mix:** Your opponent sets the mix. Questions are dealt in shuffled cycles of 25: Disciple deals 17 Easy / 4 Medium / 4 Hard, Scholar 3 Easy / 19 Medium / 3 Hard, and Prophet 2 Easy / 2 Medium / 21 Hard -- exactly 68% / 76% / 84% at the opponent's level (17/25, 19/25, 21/25). Because each cycle is shuffled, the other levels slip in unexpectedly, with no pattern to learn.
 * **Session Persistence:** Used question IDs are tracked in browser localStorage (`bulletline_used_questions`), preventing the same question from appearing twice in a single session.
-* **Automatic Reshuffling:** When all available questions have been asked (accounting for which category, if any, and which paid packs you own), a shuffle modal appears notifying you that the deck is being reset. The used question log is cleared, and every available question becomes eligible again.
+* **Per-Level Reshuffling:** Each level keeps its own no-repeat pile. When one level's questions in your current pool (accounting for which category, if any, and which paid packs you own) have all been asked, that level alone quietly reshuffles -- no pop-up, no interruption -- while the other levels keep their progress.
 * **Graceful Fallback:** If localStorage is unavailable (e.g., private browsing mode or embedded browsers), the question deck still tracks usage in-memory for that session only--you won't replay questions until you reload the page.
-* **Randomized Draw:** Active questions are randomly shuffled on each reset to ensure varied game experiences.
 * **No manual reset control:** A previous version of the game had a manual "Reshuffle Deck" button on the title screen. It has since been intentionally removed -- deck shuffling is now handled entirely by the automatic system above, and there is no manual override on the title screen.
 
 ---
@@ -251,4 +252,4 @@ This game is proprietary software. See the LICENSE file for the full terms: no c
 
 ---
 
-[HOW TO PLAY](readme.html) | [FEEDBACK](mailto:billpmonti@gmail.com) | [BUY TICKET](store.html) | [TERMS](terms.html) | [LICENSE](license.html)
+[HOW TO PLAY](readme.html) | [BUY TICKET](store.html) | [FEEDBACK](mailto:billpmonti@gmail.com) | [TERMS](terms.html) | [LICENSE](license.html)

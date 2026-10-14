@@ -199,7 +199,7 @@
         <ul>
           <li><strong>KJV Scripture Integration:</strong> Every trivia question is paired with a direct King James Bible reference and scripture quote to deepen your study and understanding of the Word.</li>
           <li><strong>The Shekel Builder Round:</strong> A fast-paced 60-second opening round where consecutive correct answers pay a rising combo ladder -- 1,000 -&gt; 1,250 -&gt; 1,500 -&gt; 1,750 -&gt; 2,000 Shekels of Silver. Five in a row banks 1 AUTO STALL + 1 AUTO ADVANCE and restarts the ladder; a miss resets it to 1,000.</li>
-          <li><strong>Choose Your Opponent:</strong> After START GAME, pick your rival's smarts -- <strong>Disciple</strong> (68% accuracy, x1 win bonus), <strong>Scholar</strong> (76% accuracy, x1.25 win bonus), or <strong>Prophet</strong> (84% accuracy, x1.5 win bonus). Sharper mind, richer win. Your choice is remembered between visits.</li>
+          <li><strong>Choose Your Opponent:</strong> After START GAME, pick your rival's smarts -- <strong>Disciple</strong> (68% accuracy, x1 win bonus), <strong>Scholar</strong> (76% accuracy, x1.25 win bonus), or <strong>Prophet</strong> (84% accuracy, x1.5 win bonus). Sharper mind, richer win. Your choice is remembered between visits. The number on the card also sets your questions: Disciple deals 68% Easy questions, Scholar 76% Medium, and Prophet 84% Hard (see Question Deck Shuffle Logic below).</li>
           <li><strong>Head-to-Head Race Mechanics:</strong> A 7-step sprint against the rival Train X -- you board at Step 5, 6, or 7 depending on the line you choose, and the first to reach the station (Step 0) wins. Correct answers advance your Bullet Line; Train X advances on its own hidden accuracy roll each round.</li>
           <li><strong>Hazard Events:</strong> Up to one Bible-themed track hazard per race (round 4 or later, never in sudden death) -- Bridge Out, the Red Sea, Daniel's Lions, the Fiery Furnace, and 10 more, drawn from a shuffled no-repeat deck. The race question doubles as your dodge test: answer correctly to dodge it, miss and you're knocked back a step.</li>
           <li><strong>Rivalry Record:</strong> Your lifetime win-loss record against each opponent is tracked and shown as a badge on their card (FIRST MEETING, gold when you're leading, red when trailing) and as a W-L card on every game summary.</li>
@@ -388,10 +388,11 @@ Page reload/new browser session:
         <h2><span class="e">&#128260;</span>Question Deck Shuffle Logic</h2>
         <p>The game uses a <strong>smart deck shuffling system</strong> to ensure a fresh experience while preventing question fatigue:</p>
         <ul>
+          <li><strong>Question Levels:</strong> Every question carries a hidden level -- Easy, Medium, or Hard -- calculated when the game loads, from how familiar its subject is across the whole question bank and how close its wrong answers are to the right one. About a third of the bank falls at each level.</li>
+          <li><strong>Opponent Level Mix:</strong> Your opponent sets the mix. Questions are dealt in shuffled cycles of 25: Disciple deals 17 Easy / 4 Medium / 4 Hard, Scholar 3 Easy / 19 Medium / 3 Hard, and Prophet 2 Easy / 2 Medium / 21 Hard -- exactly 68% / 76% / 84% at the opponent's level (17/25, 19/25, 21/25). Because each cycle is shuffled, the other levels slip in unexpectedly, with no pattern to learn.</li>
           <li><strong>Session Persistence:</strong> Used question IDs are tracked in browser localStorage (<code>bulletline_used_questions</code>), preventing the same question from appearing twice in a single session.</li>
-          <li><strong>Automatic Reshuffling:</strong> When all available questions have been asked (accounting for which category, if any, and which paid packs you own), a shuffle modal appears notifying you that the deck is being reset. The used question log is cleared, and every available question becomes eligible again.</li>
+          <li><strong>Per-Level Reshuffling:</strong> Each level keeps its own no-repeat pile. When one level's questions in your current pool (accounting for which category, if any, and which paid packs you own) have all been asked, that level alone quietly reshuffles -- no pop-up, no interruption -- while the other levels keep their progress.</li>
           <li><strong>Graceful Fallback:</strong> If localStorage is unavailable (e.g., private browsing mode or embedded browsers), the question deck still tracks usage in-memory for that session only--you won't replay questions until you reload the page.</li>
-          <li><strong>Randomized Draw:</strong> Active questions are randomly shuffled on each reset to ensure varied game experiences.</li>
           <li><strong>No manual reset control:</strong> A previous version of the game had a manual "Reshuffle Deck" button on the title screen. It has since been intentionally removed -- deck shuffling is now handled entirely by the automatic system above, and there is no manual override on the title screen.</li>
         </ul>
       </section>
@@ -441,7 +442,7 @@ Page reload/new browser session:
 
     <footer>
       <nav class="doc-links">
-        <a href="#">HOW TO PLAY</a><span class="sep">|</span><a href="mailto:billpmonti@gmail.com">FEEDBACK</a><span class="sep">|</span><a href="store.html">BUY TICKET</a><span class="sep">|</span><a href="terms.html">TERMS</a><span class="sep">|</span><a href="license.html">LICENSE</a>
+        <a href="#">HOW TO PLAY</a><span class="sep">|</span><a href="store.html">BUY TICKET</a><span class="sep">|</span><a href="mailto:billpmonti@gmail.com">FEEDBACK</a><span class="sep">|</span><a href="terms.html">TERMS</a><span class="sep">|</span><a href="license.html">LICENSE</a>
       </nav>
       <a class="back" href="index.html" onclick="window.close();setTimeout(function(){window.location.href='index.html';},300);return false;">&larr; Back to the Game</a>
       <p class="copy">&copy; 2026 William Monti. All rights reserved.</p>
