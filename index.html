@@ -31,7 +31,7 @@
   <meta property="og:url" content="https://eagle3440.github.io/scripture-pursuit/" />
   <meta property="og:type" content="website" />
 
-  <link rel="stylesheet" href="styles.css?v=69">
+  <link rel="stylesheet" href="styles.css?v=70">
   <script src="https://cdn.jsdelivr.net/npm/gameanalytics@4.0.0/umd/gameanalytics.min.js"></script>
 </head>
 <body>
@@ -70,6 +70,7 @@
   <div id="sticky-bottom-bar" class="sticky-bottom-actions hidden">
     <div class="footer-row">
       <a onclick="resetGame()">PLAY AGAIN</a>
+      <a href="readme.html" target="_blank">HOW TO PLAY</a>
       <a href="story.html" target="_blank">STORY</a>
       <span class="buy-ticket-wrap">
         <a href="store.html" class="buy-ticket-link" onclick="dismissTicketGlow()">BUY TICKET</a>
@@ -2910,9 +2911,13 @@
       const br = board.getBoundingClientRect();
       if (!br.width) return; // layout not ready (or headless test)
       board.querySelectorAll('.split-badge[data-coin]').forEach(badge => {
-        // While the verse is up the name text is hidden, so center the coin
-        // in the whole step row; otherwise stay on the badge (text area).
-        const target = (board.classList.contains('verses-up') && badge.closest('.step')) || badge;
+        // While the verse is up the name text is hidden, so on DESKTOP center
+        // the coin in the whole step row; otherwise stay on the badge (text
+        // area). Phone (2026-10-15, Bill's call): step text is hidden entirely
+        // and the coins must stay put — always target the badge, verse or not,
+        // so a coin can never shift sideways when the verse opens or closes.
+        const phoneCoinsLocked = window.matchMedia && window.matchMedia('(max-width: 767px)').matches;
+        const target = (!phoneCoinsLocked && board.classList.contains('verses-up') && badge.closest('.step')) || badge;
         const r = target.getBoundingClientRect();
         if (!r.width) return;
         const img = document.createElement('img');

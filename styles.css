@@ -2576,6 +2576,11 @@
   #coin-overlay .overlay-coin { width: 74px; height: 74px; }
   .chaser-text-badge.split-badge, .player-token.split-badge { padding: 0 6px; gap: 84px; }
   .split-side { font-size: 0.65rem; }
+  /* --- Race steps on phone: coins only, no step text (2026-10-15, Bill's
+         call — the split names clip on phone widths anyway). visibility,
+         not display, so the badge geometry stays identical and the coin's
+         center cannot move. Desktop keeps its step text. --- */
+  #board-container .split-side { visibility: hidden; }
   /* Photo finish coins match the smaller phone coin. */
   .tiebreak-tokens.coins-only { gap: 20px; }
   .tiebreak-tokens.coins-only .split-badge { width: 74px; height: 74px; }
