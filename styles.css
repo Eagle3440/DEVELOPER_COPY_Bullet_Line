@@ -139,6 +139,22 @@
         padding: 3px 6px;
         white-space: nowrap;
       }
+      /* Post-race bar: same phone treatment (2026-10-15, Bill's call).
+         Its row is PLAY AGAIN | STORY | BUY TICKET | FEEDBACK | SHARE —
+         3 over 2 in the same equal columns, FEEDBACK under PLAY AGAIN
+         and SHARE under STORY. Desktop keeps the single flex row. */
+      #sticky-bottom-bar .footer-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px 6px;
+        justify-items: center;
+        align-items: center;
+      }
+      #sticky-bottom-bar .footer-row a {
+        font-size: 13px;
+        padding: 3px 6px;
+        white-space: nowrap;
+      }
     }
 
     /* Moving glow around BUY TICKET when the player can afford the next

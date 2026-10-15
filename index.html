@@ -31,7 +31,7 @@
   <meta property="og:url" content="https://eagle3440.github.io/scripture-pursuit/" />
   <meta property="og:type" content="website" />
 
-  <link rel="stylesheet" href="styles.css?v=68">
+  <link rel="stylesheet" href="styles.css?v=69">
   <script src="https://cdn.jsdelivr.net/npm/gameanalytics@4.0.0/umd/gameanalytics.min.js"></script>
 </head>
 <body>
@@ -69,14 +69,16 @@
 
   <div id="sticky-bottom-bar" class="sticky-bottom-actions hidden">
     <div class="footer-row">
-      <a onclick="resetGame()">RESTART GAME</a>
-      <a onclick="shareToFacebook()" title="Share to Facebook">SHARE</a>
+      <a onclick="resetGame()">PLAY AGAIN</a>
+      <a href="story.html" target="_blank">STORY</a>
       <span class="buy-ticket-wrap">
         <a href="store.html" class="buy-ticket-link" onclick="dismissTicketGlow()">BUY TICKET</a>
         <svg class="ticket-glow-svg" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false">
           <rect class="ticket-glow-rect" x="2" y="2" width="96" height="96" rx="14" ry="14" pathLength="100"></rect>
         </svg>
       </span>
+      <a onclick="openFeedbackModal()">FEEDBACK</a>
+      <a onclick="shareToFacebook()" title="Share to Facebook">SHARE</a>
     </div>
     <div class="stats-display-text" id="stats-display-text">
       GAMES PLAYED: <span id="stat-played">0</span> | WON: <span id="stat-won">0</span> | LOST: <span id="stat-lost">0</span>
