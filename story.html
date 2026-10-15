@@ -101,6 +101,14 @@
     .page{padding:44px 16px 60px;}
     .card{padding:10px 24px 28px;}
     body{font-size:16px;}
+    /* Phone footer links: 3 over 3, columns lined up (2026-10-14, Bill's
+       call — same treatment as the game footer). The "|" separators hide
+       on phone only; desktop keeps the single line. Letter spacing
+       tightens on phone only, or HOW TO PLAY cannot fit one-third of
+       the card on a single line. */
+    .doc-links{display:grid;grid-template-columns:repeat(3,1fr);gap:10px 6px;justify-items:center;letter-spacing:.06em;}
+    .doc-links .sep{display:none;}
+    .doc-links a{white-space:nowrap;}
   }
 
   @media print{
