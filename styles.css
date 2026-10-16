@@ -2598,8 +2598,11 @@
   /* --- Race tokens: smaller labels so names stop truncating --- */
   .chaser-text-badge, .player-token { font-size: 0.6rem; letter-spacing: 0; }
 
-  /* --- Split-text badge: smaller coin on phones --- */
-  #coin-overlay .overlay-coin { width: 74px; height: 74px; }
+  /* --- Split-text badge: phone coin size (90px, 2026-10-16, Bill's call —
+         up from 74px; desktop stays 116px). Size only: the coin's center is
+         placed on the badge center by the overlay, so growing the coin
+         cannot move its center or make it shift when the verse shows. --- */
+  #coin-overlay .overlay-coin { width: 90px; height: 90px; }
   .chaser-text-badge.split-badge, .player-token.split-badge { padding: 0 6px; gap: 84px; }
   .split-side { font-size: 0.65rem; }
   /* --- Race steps on phone: coins only, no step text (2026-10-15, Bill's
@@ -2607,9 +2610,9 @@
          not display, so the badge geometry stays identical and the coin's
          center cannot move. Desktop keeps its step text. --- */
   #board-container .split-side { visibility: hidden; }
-  /* Photo finish coins match the smaller phone coin. */
+  /* Photo finish coins match the phone race coin (90px). */
   .tiebreak-tokens.coins-only { gap: 20px; }
-  .tiebreak-tokens.coins-only .split-badge { width: 74px; height: 74px; }
+  .tiebreak-tokens.coins-only .split-badge { width: 90px; height: 90px; }
 
   /* --- Footers: drop the blur on phones (2026-10-05). The backdrop-filter
          made the footer's background repaint slower than its text while
