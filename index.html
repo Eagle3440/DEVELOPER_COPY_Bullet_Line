@@ -31,7 +31,7 @@
   <meta property="og:url" content="https://eagle3440.github.io/scripture-pursuit/" />
   <meta property="og:type" content="website" />
 
-  <link rel="stylesheet" href="styles.css?v=72">
+  <link rel="stylesheet" href="styles.css?v=75">
   <script src="https://cdn.jsdelivr.net/npm/gameanalytics@4.0.0/umd/gameanalytics.min.js"></script>
 </head>
 <body>
@@ -304,7 +304,7 @@
               <div class="ticker-header">
                 <span class="ticker-title">ARRIVALS / DEPARTURES</span>
                 <div class="ticker-controls">
-                  <span id="ticker-clock" class="ticker-clock">--:--</span>
+                  <div id="ticker-clock" class="flip-clock" aria-label="Station clock"></div>
                 </div>
               </div>
               <div id="ticker-caption" class="ticker-caption">🔒 LOCKED lines need their matching Bullet Train Ticket — click a locked line, or visit the Ticket Store, to unlock it.</div>
@@ -498,6 +498,38 @@
       if (titleWarningTimer) { clearTimeout(titleWarningTimer); titleWarningTimer = null; }
       titleWarningScheduledAt = null;
     }
+    // Publishes the Bullet Line's next departure for the departures board's
+    // pinned Bullet Line row (2026-10-16): the board reads
+    // window.bulletlineDeparture — destination, departure timestamp, mode —
+    // all derived here from the same scheduler state the LED NEXT DEPARTURE
+    // countdown uses, and announced on the station clock's event bus, so
+    // the row, the LED and the clock can never disagree. Called whenever
+    // the schedule changes (arm, warning, play, hide, re-arm).
+    function publishBulletlineDeparture() {
+      let mode = 'scheduled', destIdx = (titlePlaylistIdx + 1) % TITLE_PLAYLIST.length, departAt = null;
+      if (titleWarningTimer || titleWarningScheduledAt) {
+        mode = 'departing'; destIdx = titlePlaylistIdx;
+        departAt = titleWarningScheduledAt ? titleWarningScheduledAt + TITLE_WARNING_LEAD_MS : Date.now();
+      } else if (introVideoPlaying) {
+        mode = 'enroute'; destIdx = titlePlaylistIdx; departAt = Date.now();
+      } else if (titleIntroTimer && titleIntroScheduledAt) {
+        departAt = titleIntroScheduledAt + TITLE_INTRO_REPLAY_MS;
+      }
+      const file = TITLE_PLAYLIST[destIdx];
+      const d = TITLE_DESTINATIONS[file] || TITLE_DESTINATIONS['title-intro.mp4'];
+      window.bulletlineDeparture = {
+        // Board name: the full name when it fits the 20-flap column, else
+        // the short name. Pool of Bethesda and Galilee Hillside are
+        // special-cased to their short names (Bill's calls, 2026-10-16):
+        // their full names ("THE POOL OF BETHESDA", "THE GALILEE
+        // HILLSIDE") are exactly 20 flaps and fill the column edge to
+        // edge, so the board drops the THE. The LED ticker keeps the
+        // full names.
+        destBoard: (file === 'pool-of-bethesda.mp4' || file === 'galilee-hillside.mp4') ? d.short : (d.full.length <= 20 ? d.full : d.short),
+        departAt: departAt, mode: mode
+      };
+      if (window.stationEvents) window.stationEvents.emit('departure-changed', window.bulletlineDeparture);
+    }
     // Cut the weather music while a title video (and its warning) is happening.
     // Direct DOM access on purpose: safe to call even before the ticker exists.
     function cutTitleWeatherMusic() {
@@ -517,6 +549,9 @@
     let line2Launching = false;
     function showTitleLaunchWarning() {
       if (!titleTickerReady) return;
+      // Station event (2026-10-16 sync): the departures board hears the
+      // departure from the same source the LED lines react to.
+      if (window.stationEvents) window.stationEvents.emit('departure-warning');
       if (titleRestoreTimer) { clearTimeout(titleRestoreTimer); titleRestoreTimer = null; }
       const msg = document.getElementById('led-ticker-msg');
       if (msg) { msg.classList.remove('warn-out'); msg.classList.add('warn'); }
@@ -559,6 +594,9 @@
         const m2 = document.getElementById('led-ticker-msg2');
         if (m2) m2.style.visibility = 'visible';
         ledTickerLine2.resume();
+        // Station event (2026-10-16 sync): lines are handed back — the
+        // departures board re-flips with them.
+        if (window.stationEvents) window.stationEvents.emit('departure-clear');
       }, 650);
     }
     function isPhoneWidth() {
@@ -580,6 +618,7 @@
         }
       }, ms);
       titleIntroScheduledAt = Date.now() - (TITLE_INTRO_REPLAY_MS - ms);
+      publishBulletlineDeparture();
     }
     function clearTitleFadeTimers() {
       if (titleFadeTimer1) { clearTimeout(titleFadeTimer1); titleFadeTimer1 = null; }
@@ -629,6 +668,7 @@
       iv.muted = soundMuted; // follows the sound switch (starts muted: autoplay-safe)
       const p = iv.play();
       if (p && typeof p.catch === 'function') p.catch(() => showTitlePicture());
+      publishBulletlineDeparture(); // the departure is now EN ROUTE on the board's Bullet Line row
     }
     // Arms the 3-second launch-warning lead before a title video. Extracted so
     // the background-tab resume can re-arm it with the exact remaining time.
@@ -642,6 +682,7 @@
         if (document.getElementById('start-game-btn').classList.contains('hidden')) return;
         playTitleVideo(TITLE_PLAYLIST[titlePlaylistIdx]);
       }, ms);
+      publishBulletlineDeparture();
     }
     function playTitlePlaylistIndex(i, withCountdown) {
       titlePlaylistIdx = i;
@@ -658,6 +699,7 @@
         cutTitleWeatherMusic();
         playTitleVideo(TITLE_PLAYLIST[i]);
       }
+      publishBulletlineDeparture();
     }
     function playTitleIntro() { playTitlePlaylistIndex(0, false); }
     function hideTitleIntro() {
@@ -667,6 +709,7 @@
       snapTitleVeil();
       restoreTickerLine1();
       introVideoPlaying = false;
+      publishBulletlineDeparture();
       const iv = document.getElementById('title-intro-video');
       const rb = document.getElementById('title-intro-replay');
       if (iv) { iv.pause(); iv.classList.add('hidden'); }
@@ -2927,11 +2970,16 @@
       const br = board.getBoundingClientRect();
       if (!br.width) return; // layout not ready (or headless test)
       board.querySelectorAll('.split-badge[data-coin]').forEach(badge => {
-        // While the verse is up the name text is hidden, so on DESKTOP center
-        // the coin in the whole step row; otherwise stay on the badge (text
-        // area). Phone (2026-10-15, Bill's call): step text is hidden entirely
-        // and the coins must stay put — always target the badge, verse or not,
-        // so a coin can never shift sideways when the verse opens or closes.
+        // Coin target (Bill's calls): normally the badge. While the verse
+        // is up on DESKTOP, the board squeezes to make room for the verse
+        // panel, the step text hides, and the shrunken badge sits right of
+        // the step's middle — so with the verse up the coin centers on the
+        // STEP BOX instead (dead center of the visible rectangle; Bill's
+        // pick, option A, 2026-10-16, after measuring both ways through a
+        // real race: badge-centered put the coin ~16px right of the step's
+        // center in the squeezed board, step-centered put it within 1px).
+        // Phone never squeezes and its text is always hidden — the coin
+        // stays locked to the badge there, verse or not (2026-10-15).
         const phoneCoinsLocked = window.matchMedia && window.matchMedia('(max-width: 767px)').matches;
         const target = (!phoneCoinsLocked && board.classList.contains('verses-up') && badge.closest('.step')) || badge;
         const r = target.getBoundingClientRect();
@@ -3800,23 +3848,25 @@
       // Each line maps to a store ticket. packId: null = always-unlocked free tier.
       // Matches bulletline_owned_packs used elsewhere on this page and in store.html.
       const TICKET_LINES_A = [
-        { line: "GENESIS LINE",   dest: "EDEN JUNCTION",     trk: "1", packId: null },
-        { line: "TABERNACLE WAY", dest: "MOUNT NEBO", trk: "2", packId: "torah" },
-        { line: "SOLOMON LIMITED", dest: "SAMARIA HEIGHTS", trk: "3", packId: "kings" },
-        { line: "MANTLE EXPRESS", dest: "CARMEL RIDGE", trk: "4", packId: "prophets" },
-        { line: "NAZARETH LOCAL", dest: "GALILEE PIER", trk: "5", packId: "gospels" },
-        { line: "APOSTOLIC LINK",  dest: "PATMOS PASS", trk: "6", packId: "epistles" }
+        { line: "GENESIS LINE",   dest: "EDEN JUNCTION",     trk: "2", packId: null },
+        { line: "TABERNACLE WAY", dest: "MOUNT NEBO", trk: "3", packId: "torah" },
+        { line: "SOLOMON LIMITED", dest: "SAMARIA HEIGHTS", trk: "4", packId: "kings" },
+        { line: "MANTLE EXPRESS", dest: "CARMEL RIDGE", trk: "5", packId: "prophets" },
+        { line: "NAZARETH LOCAL", dest: "GALILEE PIER", trk: "6", packId: "gospels" },
+        { line: "APOSTOLIC LINK",  dest: "PATMOS PASS", trk: "7", packId: "epistles" }
       ];
       // A second, purely atmospheric rotation of trains — not tied to any
       // store ticket, so these are always shown as running (packId: null)
-      // with made-up track numbers continuing on from list A's 1-6.
+      // with made-up track numbers continuing on from list A's 2-7.
+      // (All tracks bumped +1 on 2026-10-16: track 0 belongs to the
+      // Bullet Line's own pinned row at the top of the board.)
       const TICKET_LINES_B = [
-        { line: "PATRIARCH PATH",  dest: "BEERSHEBA WELL", trk: "7",  packId: null },
-        { line: "MANNA RUNNER",    dest: "ELIM SPRINGS",   trk: "8",  packId: null },
-        { line: "MANTLE SPUR",     dest: "CARMEL RIDGE",   trk: "9",  packId: null },
-        { line: "BETHLEHEM EXP",   dest: "STAR OVERLOOK",  trk: "10", packId: null },
-        { line: "PENTECOST WAY",   dest: "UPPER ROOM",     trk: "11", packId: null },
-        { line: "REVELATION LINE", dest: "NEW JERUSALEM",  trk: "12", packId: null }
+        { line: "PATRIARCH PATH",  dest: "BEERSHEBA WELL", trk: "8",  packId: null },
+        { line: "MANNA RUNNER",    dest: "ELIM SPRINGS",   trk: "9",  packId: null },
+        { line: "MANTLE SPUR",     dest: "CARMEL RIDGE",   trk: "10", packId: null },
+        { line: "BETHLEHEM EXP",   dest: "STAR OVERLOOK",  trk: "11", packId: null },
+        { line: "PENTECOST WAY",   dest: "UPPER ROOM",     trk: "12", packId: null },
+        { line: "REVELATION LINE", dest: "NEW JERUSALEM",  trk: "13", packId: null }
       ];
       let activeTicketLines = TICKET_LINES_A;
       let ticketListRenderCount = 0;
@@ -3874,10 +3924,47 @@
         }
       }
 
+      // The Bullet Line's own row (2026-10-16, Bill's call): pinned to the
+      // top of the board (sortMinutes -1; the tracked rows sort by time
+      // beneath it), track 0 — and the only row whose times are REAL.
+      // Colors are the board's STANDARD colors, exactly like every other
+      // row (Bill's call, 2026-10-16, after a blue-row detour): fields in
+      // the standard cyan via TICKER_FIELDS, status in the standard
+      // per-status colors — countdown and EN ROUTE in the ON TIME green,
+      // DEPARTING in the BOARDING NOW blue.
+      // It reads the next departure the title-video scheduler publishes
+      // from the station clock's state (window.bulletlineDeparture):
+      // destination, departure time and countdown from that one source, so
+      // the row, the LED countdown and the clock can never disagree.
+      function bulletlineTickerRow(idx) {
+        const pub = window.bulletlineDeparture || null;
+        let dest = "", timeStr = "--:--", statusLabel = "STANDBY", statusColor = "#00ffaa";
+        if (pub) {
+          dest = pub.destBoard || "";
+          if (pub.departAt) {
+            const d = new Date(pub.departAt);
+            timeStr = String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0");
+          }
+          if (pub.mode === "departing") { statusLabel = "DEPARTING"; statusColor = "#33b5ff"; } // BOARDING NOW blue — the standard "leaving now" color
+          else if (pub.mode === "enroute") { statusLabel = "EN ROUTE"; }
+          else {
+            const mins = pub.departAt ? Math.max(1, Math.ceil((pub.departAt - Date.now()) / 60000)) : null;
+            statusLabel = mins ? "IN " + mins + " MIN" : "ON TIME";
+          }
+        }
+        return {
+          idx: idx,
+          line: tickerPad("BULLET LINE", 16), dest: tickerPad(dest, 20),
+          time: tickerPad(timeStr, 6), trk: tickerPad("0", 4),
+          status: tickerPad(statusLabel, 12), statusColor: statusColor,
+          sortMinutes: -1, locked: false
+        };
+      }
+
       function tickerBuildRows() {
         const owned = tickerOwnedPacks();
         const now = new Date();
-        return activeTicketLines.map((t, idx) => {
+        const rows = activeTicketLines.map((t, idx) => {
           const accessible = t.packId === null || owned.includes(t.packId);
           const st = accessible
             ? OPERATIONAL_STATUSES[Math.floor(Math.random() * OPERATIONAL_STATUSES.length)]
@@ -3903,6 +3990,8 @@
             locked: !accessible
           };
         });
+        rows.push(bulletlineTickerRow(rows.length));
+        return rows;
       }
 
       const headerRow = document.getElementById("ticker-header-row");
@@ -3973,7 +4062,7 @@
       let tickerRowsData = [];
 
       function tickerBuildBoard() {
-        for (let r = 0; r < TICKET_LINES_A.length; r++) {
+        for (let r = 0; r < TICKET_LINES_A.length + 1; r++) { // +1: the Bullet Line's pinned row
           const rowEl = document.createElement("div");
           rowEl.style.cssText = "display:flex; width:100%;";
           const rowData = {};
@@ -4076,6 +4165,28 @@
       }
 
       tickerRender();
+      // --- Station clock + event bus (2026-10-16) -------------------------
+      // One time source and one event source for the whole title screen.
+      // stationClock ticks once per second (onTick subscribers receive the
+      // current Date) and carries named station events (on/emit) —
+      // 'departure-warning' / 'departure-clear' are published by the
+      // title-video scheduler in the main script. The flip clock, the
+      // departures board and the LED ticker all hang off this; nothing on
+      // the title screen keeps its own time anymore.
+      const stationClock = (() => {
+        const subs = [];
+        const evSubs = {};
+        return {
+          now() { return new Date(); },
+          onTick(fn) { subs.push(fn); },
+          on(name, fn) { (evSubs[name] = evSubs[name] || []).push(fn); },
+          emit(name, payload) { (evSubs[name] || []).slice().forEach(f => { try { f(payload); } catch (e) {} }); },
+          _emit(d) { subs.forEach(f => { try { f(d); } catch (e) {} }); }
+        };
+      })();
+      window.stationClock = stationClock;
+      window.stationEvents = stationClock;
+
       function tickerBoardIntervalTick() {
         tickerRender();
         ticketListRenderCount++;
@@ -4089,14 +4200,32 @@
           }
         }
       }
-      let tickerBoardIntervalId = setInterval(tickerBoardIntervalTick, 60000);
+      // The board re-flips on the station clock's minute (2026-10-16 sync):
+      // when the clock's seconds roll to :00, the board renders — so the
+      // board and the flip clock's minute card flip in the same instant.
+      // (Before this, the board ran its own free 60s interval from page
+      // load, drifting against the wall clock by the load offset.)
+      let tickerBoardPaused = false;
+      stationClock.onTick(d => {
+        if (tickerBoardPaused) return;
+        if (d.getSeconds() === 0) tickerBoardIntervalTick();
+      });
+      // Departure events: the board answers a Bullet Line departure with a
+      // full re-flip, in the same moment the LED lines react, and re-flips
+      // again when the lines are handed back after the video.
+      stationClock.on('departure-warning', () => { if (!tickerBoardPaused) tickerRender(); });
+      stationClock.on('departure-clear', () => { if (!tickerBoardPaused) tickerRender(); });
+      // The Bullet Line row's data changes when the scheduler publishes a
+      // new departure (arm / warning / play / restore) — re-render then, or
+      // the row would only pick the change up at the next minute tick and
+      // the 3-second DEPARTING state would never be seen (2026-10-16 fix,
+      // caught in verification).
+      stationClock.on('departure-changed', () => { if (!tickerBoardPaused) tickerRender(); });
       // Background-tab hush hooks (see the visibilitychange handler in the
-      // main script): pause the 60s re-flip while hidden, resume on return.
-      window.__tickerBoardPause = function () {
-        if (tickerBoardIntervalId) { clearInterval(tickerBoardIntervalId); tickerBoardIntervalId = null; }
-      };
+      // main script): pause the minute re-flip while hidden, resume on return.
+      window.__tickerBoardPause = function () { tickerBoardPaused = true; };
       window.__tickerBoardResume = function () {
-        if (!tickerBoardIntervalId) { tickerRender(); tickerBoardIntervalId = setInterval(tickerBoardIntervalTick, 60000); }
+        if (tickerBoardPaused) { tickerBoardPaused = false; tickerRender(); }
       };
       window.__tickerAudioSuspend = function () {
         if (tickerAudioCtx && tickerAudioCtx.state === "running") tickerAudioCtx.suspend();
@@ -4105,14 +4234,84 @@
         if (tickerAudioCtx && tickerAudioCtx.state === "suspended" && tickerSoundOn && !tickerSoundMuted) tickerAudioCtx.resume();
       };
 
-      function tickerUpdateClock() {
-        const now = new Date();
-        const h = String(now.getHours()).padStart(2, "0");
-        const m = String(now.getMinutes()).padStart(2, "0");
-        document.getElementById("ticker-clock").textContent = h + ":" + m;
+      // Flip clock rendering — stationClock itself is defined above, with
+      // the departures board's minute sync (2026-10-16).
+
+      const flipCards = [];
+      (function buildFlipClock() {
+        const el = document.getElementById("ticker-clock");
+        const cardsWrap = document.createElement("div");
+        cardsWrap.className = "flip-clock-cards";
+        ["h", "h", ":", "m", "m"].forEach(kind => {
+          if (kind === ":") {
+            const c = document.createElement("span");
+            c.className = "flip-colon";
+            c.textContent = ":";
+            cardsWrap.appendChild(c);
+            return;
+          }
+          const card = document.createElement("div");
+          card.className = "flip-card";
+          card.innerHTML =
+            '<span class="flip-half flip-top"><span>0</span></span>' +
+            '<span class="flip-half flip-bottom"><span>0</span></span>' +
+            '<span class="flip-leaf flip-leaf-top"><span>0</span></span>' +
+            '<span class="flip-leaf flip-leaf-bottom"><span>0</span></span>';
+          cardsWrap.appendChild(card);
+          flipCards.push({
+            el: card,
+            top: card.querySelector(".flip-top span"),
+            bottom: card.querySelector(".flip-bottom span"),
+            leafTop: card.querySelector(".flip-leaf-top span"),
+            leafBottom: card.querySelector(".flip-leaf-bottom span"),
+            value: null,
+            flipping: false
+          });
+        });
+        const plate = document.createElement("div");
+        plate.className = "flip-plate";
+        plate.textContent = "BULLET LINE";
+        el.appendChild(cardsWrap);
+        el.appendChild(plate);
+      })();
+
+      function flipCardTo(card, digit) {
+        if (card.value === digit) return false;
+        if (card.value === null || card.flipping) {
+          card.top.textContent = digit;
+          card.bottom.textContent = digit;
+          card.value = digit;
+          return false;
+        }
+        card.flipping = true;
+        card.leafTop.textContent = card.value;
+        card.leafBottom.textContent = digit;
+        card.bottom.textContent = digit;
+        card.el.classList.remove("flipping");
+        void card.el.offsetWidth;
+        card.el.classList.add("flipping");
+        setTimeout(() => {
+          card.top.textContent = digit;
+          card.el.classList.remove("flipping");
+          card.flipping = false;
+        }, 560);
+        card.value = digit;
+        return true;
       }
-      tickerUpdateClock();
-      setInterval(tickerUpdateClock, 1000 * 30);
+
+      function flipClockRender(d) {
+        const hh = String(d.getHours()).padStart(2, "0");
+        const mm = String(d.getMinutes()).padStart(2, "0");
+        let flipped = false;
+        flipped = flipCardTo(flipCards[0], hh[0]) || flipped;
+        flipped = flipCardTo(flipCards[1], hh[1]) || flipped;
+        flipped = flipCardTo(flipCards[2], mm[0]) || flipped;
+        flipped = flipCardTo(flipCards[3], mm[1]) || flipped;
+        if (flipped) tickerPlayClack();
+      }
+      stationClock.onTick(flipClockRender);
+      stationClock._emit(new Date());
+      setInterval(() => stationClock._emit(new Date()), 1000);
     })();
   </script>
 </body>

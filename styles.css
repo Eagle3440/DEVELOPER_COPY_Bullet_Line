@@ -2043,7 +2043,7 @@
         #030807;
       backdrop-filter: blur(20px);
       border-radius: 16px;
-      padding: 16px; /* board padding restored to original 2026-10-13 (Bill: "make a little longer, just don't overlap the footer") — the fit fix is carried by the header/caption/card-bottom squeezes (22px); worst-case panel clearance above the footer ~18px */
+      padding: 0 16px 15px; /* top 16→0 across the two 2026-10-16 clock builds: the enlarged Solari flip clock fills the header strip top-to-bottom, and its height is repaid here + the header padding trim so the rows end at the same Y as before in every ticket state; bottom 16→15 repays the last pixel of the 7th (Bullet Line) row, 2026-10-16 */
       box-shadow: 0 20px 50px rgba(0,0,0,0.9), inset 0 0 2px rgba(0, 180, 255, 0.3);
       border: 1px solid rgba(0, 150, 255, 0.35);
       width: 100%;
@@ -2055,10 +2055,10 @@
     .ticker-header {
       display: flex;
       justify-content: space-between;
-      align-items: baseline;
+      align-items: center;
       border-bottom: 1px solid rgba(43, 79, 255, 0.55);
-      padding-bottom: 6px;
-      margin-bottom: 8px;
+      padding-bottom: 0; /* 6→0 across the 2026-10-16 clock builds: flip clock room, net-zero with the other header trims */
+      margin-bottom: 4px; /* 8→4 on 2026-10-16: same fit */
     }
 
     .ticker-title {
@@ -2076,12 +2076,88 @@
       gap: 12px;
     }
 
-    .ticker-clock {
-      color: #00d2ff;
-      text-shadow: 0 0 8px rgba(0, 210, 255, 0.7);
-      font-family: 'Playfair Display', serif;
-      font-size: 15px;
-      letter-spacing: 1px;
+    /* Solari flip clock (2026-10-16, Bill's pick — style #3): cream flap
+       cards with the maker's split line, dark housing, BULLET LINE plate.
+       Sized to the header slot the old text readout occupied; the header
+       trims above keep the board's rows ending at the same Y. */
+    .flip-clock {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: linear-gradient(180deg, #1b1e24, #0a0c0f);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 8px;
+      padding: 4px 9px 3px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.09);
+    }
+    .flip-clock-cards { display: flex; align-items: center; gap: 4px; }
+    .flip-card {
+      position: relative;
+      width: 28px;
+      height: 33px;
+      font-family: Arial, Helvetica, sans-serif;
+      font-weight: 700;
+      font-size: 26px;
+      color: #17181c;
+      perspective: 220px;
+      border-radius: 4px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
+    }
+    .flip-half, .flip-leaf {
+      position: absolute;
+      left: 0;
+      width: 100%;
+      height: 50%;
+      overflow: hidden;
+      background: linear-gradient(180deg, #f7f2e3, #e8dfc9);
+    }
+    .flip-half span, .flip-leaf span {
+      display: block;
+      width: 100%;
+      height: 33px;
+      line-height: 33px;
+      text-align: center;
+    }
+    .flip-top { top: 0; border-radius: 4px 4px 0 0; }
+    .flip-bottom { bottom: 0; border-radius: 0 0 4px 4px; background: linear-gradient(180deg, #eae0cb, #dcd1b4); }
+    .flip-bottom span, .flip-leaf-bottom span { transform: translateY(-16.5px); }
+    .flip-card::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 50%;
+      height: 1px;
+      background: rgba(10, 10, 10, 0.55);
+      transform: translateY(-0.5px);
+      z-index: 5;
+    }
+    .flip-leaf { z-index: 4; backface-visibility: hidden; display: none; }
+    .flip-leaf-top { top: 0; transform-origin: bottom; border-radius: 4px 4px 0 0; }
+    .flip-leaf-bottom { bottom: 0; transform-origin: top; border-radius: 0 0 4px 4px; background: linear-gradient(180deg, #eae0cb, #dcd1b4); }
+    .flip-card.flipping .flip-leaf { display: block; }
+    .flip-card.flipping .flip-leaf-top { animation: flipLeafTop 0.26s ease-in forwards; }
+    .flip-card.flipping .flip-leaf-bottom { animation: flipLeafBottom 0.26s ease-out 0.26s both; }
+    @keyframes flipLeafTop { from { transform: rotateX(0deg); } to { transform: rotateX(-90deg); } }
+    @keyframes flipLeafBottom { from { transform: rotateX(90deg); } to { transform: rotateX(0deg); } }
+    .flip-colon {
+      color: #eae0cb;
+      font-family: Arial, Helvetica, sans-serif;
+      font-weight: 700;
+      font-size: 23px;
+      line-height: 1;
+      transform: translateY(-1px);
+    }
+    .flip-plate {
+      margin-top: 2px;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 7px;
+      letter-spacing: 3px;
+      padding-left: 3px;
+      color: #b8ae95;
+      text-transform: uppercase;
+      line-height: 1;
+      white-space: nowrap;
     }
 
     .ticker-column-headers {
@@ -2090,7 +2166,7 @@
       font-size: 10px;
       color: #ffb000;
       letter-spacing: 1px;
-      padding: 0 0 8px 2px;
+      padding: 0 0 1px 2px; /* bottom 8→1 on 2026-10-16: flip clock fit trims */
     }
 
     .ticker-caption {
@@ -2118,7 +2194,7 @@
     .ticker-cell {
       flex: 1 1 0;
       min-width: 0;
-      height: 19px;
+      height: 16px; /* 19→16 on 2026-10-16: repays most of the 7th (Bullet Line) row's height across all seven rows */
       background:
         repeating-linear-gradient(
           to bottom,
@@ -2557,7 +2633,7 @@
    ============================================================ */
 @media (min-width: 768px) {
   .card-container:has(#category-select-wrap.hidden) .ticker-board {
-    padding: 42px 16px;
+    padding: 25px 16px 42px; /* top 42→25 across the 2026-10-16 builds: the enlarged flip clock's room plus the 7th row's last pixel in this state; bottom stays 42 so the panel bottom lands as tuned */
   }
 }
 
@@ -2572,12 +2648,17 @@
   .ticker-board { padding: 12px; }
   /* Start-screen fit fix is DESKTOP-ONLY (Bill's call, 2026-10-13): restore
      the pre-fix spacing on phones so the phone layout stays untouched. */
-  .ticker-header { padding-bottom: 10px; margin-bottom: 12px; }
+  .ticker-header { padding-bottom: 3px; margin-bottom: 3px; } /* tightened 2026-10-16 for the flip clock fit */
   .card-container { padding-bottom: 24px; }
   .ticker-title { font-size: 13px; letter-spacing: 1px; }
-  .ticker-clock { font-size: 12px; }
+  .flip-clock { padding: 4px 6px 3px; border-radius: 6px; }
+  .flip-card { width: 20px; height: 24px; font-size: 18px; }
+  .flip-half span, .flip-leaf span { height: 24px; line-height: 24px; }
+  .flip-bottom span, .flip-leaf-bottom span { transform: translateY(-12px); }
+  .flip-colon { font-size: 17px; }
+  .flip-plate { font-size: 6px; letter-spacing: 2px; padding-left: 2px; }
   .ticker-column-headers { font-size: 8px; letter-spacing: 0; }
-  .ticker-caption { font-size: 9px; margin: -4px 0 10px 2px; }
+  .ticker-caption { font-size: 9px; margin: -4px 0 6px 2px; }
   .ticker-cell { height: 15px; }
   .ticker-cell span { font-size: 9px; }
 
