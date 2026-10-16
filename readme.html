@@ -120,6 +120,11 @@
     font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;
     letter-spacing:.18em;text-transform:uppercase;margin-bottom:20px;
   }
+  /* Two link wrappers (3 + 2 + spacer): vanish as boxes except on phone
+     (below), so the desktop single line is unchanged. The spacer is
+     phone-only and holds the empty third column in wrapper 2. */
+  .doc-link-wrapper{display:contents;}
+  .doc-links .link-spacer{display:none;}
   .doc-links a{color:var(--blue);text-decoration:none;}
   .doc-links a:hover{text-decoration:underline;}
   .doc-links .sep{color:var(--muted);margin:0 10px;}
@@ -144,7 +149,77 @@
     body{font-size:16px;}
     table{font-size:12.5px;}
     th,td{padding:8px 8px;}
+    /* Phone footer links: two wrappers, 3 over 2, columns lined up
+       (2026-10-16, Bill's call — same treatment as the game + story).
+       Wrapper 1 takes HOW TO PLAY/BUY TICKET/FEEDBACK; wrapper 2 takes
+       TERMS/LICENSE plus an empty spacer in the third column, so TERMS
+       sits under HOW TO PLAY and LICENSE under BUY TICKET. Every link
+       takes exactly one third of its wrapper. The "|" separators hide
+       on phone only; desktop keeps the single line. Letter spacing
+       tightens on phone only so HOW TO PLAY fits its third. */
+    .doc-links{display:flex;flex-direction:column;gap:10px;letter-spacing:.06em;}
+    .doc-link-wrapper{display:flex;gap:6px;width:100%;}
+    .doc-links .doc-link-wrapper a{flex:1 1 0;min-width:0;text-align:center;white-space:nowrap;}
+    .doc-links .link-spacer{display:block;flex:1 1 0;min-width:0;}
+    .doc-links .sep{display:none;}
   }
+
+  /* ---------- feedback form (same form as the game start page) ---------- */
+  .modal-overlay{
+    position:fixed;top:0;left:0;width:100vw;height:100vh;
+    background:rgba(2,5,10,0.85);backdrop-filter:blur(8px);
+    display:flex;align-items:center;justify-content:center;
+    z-index:1000;animation:fbFadeIn 0.3s ease-out;padding:15px;
+    box-sizing:border-box;
+  }
+  .feedback-modal-box{
+    background:#0a1424;border:2px solid #00d2ff;border-radius:14px;
+    padding:28px 24px;max-width:460px;width:100%;text-align:left;
+    box-shadow:0 0 40px rgba(0,210,255,0.45);position:relative;
+    font-family:'Montserrat',sans-serif;
+  }
+  .feedback-modal-box h3{
+    font-size:1.2rem;font-weight:900;color:#00ffaa;margin:0 0 8px;
+    text-transform:uppercase;letter-spacing:1px;text-align:center;
+  }
+  .feedback-modal-box p{
+    font-size:0.85rem;color:#cfd8e3;margin:0 0 16px;
+    text-align:center;line-height:1.4;
+  }
+  .feedback-form-group{margin-bottom:14px;display:flex;flex-direction:column;gap:6px;}
+  .feedback-form-group label{
+    font-size:0.78rem;font-weight:800;color:#00d2ff;
+    letter-spacing:1px;text-transform:uppercase;
+  }
+  .feedback-form-group input,.feedback-form-group textarea{
+    background:#050a12;border:1px solid #1f314d;border-radius:8px;
+    padding:10px 12px;color:#e0e6ed;font-size:0.9rem;
+    font-family:inherit;outline:none;transition:border-color 0.2s;
+  }
+  .feedback-form-group input:focus,.feedback-form-group textarea:focus{
+    border-color:#00d2ff;box-shadow:0 0 8px rgba(0,210,255,0.3);
+  }
+  .feedback-form-group textarea{resize:vertical;min-height:100px;}
+  .feedback-btn-row{display:flex;gap:10px;margin-top:18px;}
+  .btn-feedback-cancel{
+    flex:1;background:#132238;border:1px solid #233857;color:#cfd8e3;
+    padding:11px;border-radius:8px;font-size:0.85rem;font-weight:800;
+    letter-spacing:1px;text-transform:uppercase;cursor:pointer;
+    transition:background 0.2s;font-family:'Montserrat',sans-serif;
+  }
+  .btn-feedback-cancel:hover{background:#1c314f;}
+  .btn-feedback-submit{
+    flex:1;background:linear-gradient(180deg,#00d2ff 0%,#0088cc 100%);
+    border:none;color:#05131a;padding:11px;border-radius:8px;
+    font-size:0.85rem;font-weight:900;letter-spacing:1px;
+    text-transform:uppercase;cursor:pointer;
+    box-shadow:0 0 15px rgba(0,210,255,0.4);
+    transition:transform 0.2s,box-shadow 0.2s;font-family:'Montserrat',sans-serif;
+  }
+  .btn-feedback-submit:hover{transform:translateY(-2px);box-shadow:0 0 22px rgba(0,210,255,0.7);}
+  @keyframes fbFadeIn{from{opacity:0;transform:scale(0.95);}to{opacity:1;transform:scale(1);}}
+  .hidden{display:none !important;}
+  .doc-links a.feedback-link{cursor:pointer;}
 
   @media print{
     body{background:#fff;}
@@ -442,11 +517,85 @@ Page reload/new browser session:
 
     <footer>
       <nav class="doc-links">
-        <a href="#">HOW TO PLAY</a><span class="sep">|</span><a href="store.html">BUY TICKET</a><span class="sep">|</span><a href="mailto:billpmonti@gmail.com">FEEDBACK</a><span class="sep">|</span><a href="terms.html">TERMS</a><span class="sep">|</span><a href="license.html">LICENSE</a>
+        <span class="doc-link-wrapper"><a href="#">HOW TO PLAY</a><span class="sep">|</span><a href="store.html">BUY TICKET</a><span class="sep">|</span><a href="#" class="feedback-link" onclick="openFeedbackModal();return false;">FEEDBACK</a></span><span class="sep">|</span><span class="doc-link-wrapper"><a href="terms.html">TERMS</a><span class="sep">|</span><a href="license.html">LICENSE</a><span class="link-spacer" aria-hidden="true"></span></span>
       </nav>
       <a class="back" href="index.html" onclick="window.close();setTimeout(function(){window.location.href='index.html';},300);return false;">&larr; Back to the Game</a>
       <p class="copy">&copy; 2026 William Monti. All rights reserved.</p>
     </footer>
   </div>
+
+  <!-- Feedback form: the same form as the game start page (index.html) -->
+  <div id="feedback-modal" class="modal-overlay hidden">
+    <div class="feedback-modal-box">
+      <h3>💬 Send Feedback</h3>
+      <p>Have questions, comments, or suggestions about the game? Send a message directly to billpmonti@gmail.com!</p>
+
+      <form id="feedback-form" onsubmit="submitFeedbackAjax(event)">
+        <input type="hidden" name="_subject" value="New Scripture Pursuit Feedback!">
+        <input type="hidden" name="_captcha" value="false">
+        <input type="hidden" name="_template" value="box">
+
+        <div class="feedback-form-group">
+          <label for="fb-name">Your Name</label>
+          <input type="text" id="fb-name" name="name" placeholder="Enter your name" required>
+        </div>
+
+        <div class="feedback-form-group">
+          <label for="fb-email">Your Email</label>
+          <input type="email" id="fb-email" name="email" placeholder="your.email@example.com" required>
+        </div>
+
+        <div class="feedback-form-group">
+          <label for="fb-message">Message / Feedback</label>
+          <textarea id="fb-message" name="message" placeholder="Type your feedback here..." required></textarea>
+        </div>
+
+        <div class="feedback-btn-row">
+          <button type="button" class="btn-feedback-cancel" onclick="closeFeedbackModal()">Cancel</button>
+          <button type="submit" id="fb-submit-btn" class="btn-feedback-submit">Send Email</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Feedback form — same behavior as the game start page (index.html).
+    // This page has no game audio, so there is nothing to pause while it is open.
+    function openFeedbackModal() {
+      document.getElementById('feedback-modal').classList.remove('hidden');
+    }
+    function closeFeedbackModal() {
+      document.getElementById('feedback-modal').classList.add('hidden');
+    }
+    function submitFeedbackAjax(event) {
+      event.preventDefault();
+      const form = document.getElementById('feedback-form');
+      const submitBtn = document.getElementById('fb-submit-btn');
+      submitBtn.textContent = "Sending...";
+      submitBtn.disabled = true;
+
+      const formData = new FormData(form);
+
+      fetch("https://formsubmit.co/ajax/billpmonti@gmail.com", {
+        method: "POST",
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        alert("Thank you! Your feedback has been successfully sent.");
+        form.reset();
+        submitBtn.textContent = "Send Email";
+        submitBtn.disabled = false;
+        closeFeedbackModal();
+      })
+      .catch(error => {
+        const msg = document.getElementById('fb-message').value;
+        window.location.href = `mailto:billpmonti@gmail.com?subject=Feedback&body=${encodeURIComponent(msg)}`;
+        submitBtn.textContent = "Send Email";
+        submitBtn.disabled = false;
+        closeFeedbackModal();
+      });
+    }
+  </script>
 </body>
 </html>

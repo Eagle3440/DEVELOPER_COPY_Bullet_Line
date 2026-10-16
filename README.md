@@ -252,4 +252,4 @@ This game is proprietary software. See the LICENSE file for the full terms: no c
 
 ---
 
-[HOW TO PLAY](readme.html) | [BUY TICKET](store.html) | [FEEDBACK](mailto:billpmonti@gmail.com) | [TERMS](terms.html) | [LICENSE](license.html)
+[HOW TO PLAY](readme.html) | [BUY TICKET](store.html) | [FEEDBACK](index.html#feedback) | [TERMS](terms.html) | [LICENSE](license.html)

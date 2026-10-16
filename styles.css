@@ -95,6 +95,14 @@
       flex-wrap: wrap;
     }
 
+    /* Two link wrappers (3 + 3) inside the footer rows. Outside the
+       phone rules below they vanish as boxes (display: contents), so
+       desktop/tablet lay out exactly as before — the wrappers only do
+       anything on phone. */
+    .footer-link-wrapper {
+      display: contents;
+    }
+
     #disclaimer-footer a {
       color: #00d2ff;
       text-decoration: none;
@@ -119,41 +127,59 @@
       color: #8da4c4;
     }
 
-    /* --- Phone footer links: 3 over 3, columns lined up (2026-10-14,
-       Bill's call). Phone only — desktop/tablet keep the single flex row.
-       Scoped to the FIRST row of #disclaimer-footer (the 6 links); the
-       copyright row under it and the sticky RESTART/SHARE bar (a different
-       element) are untouched. Link text and padding shrink a touch on
-       phone only, or HOW TO PLAY cannot fit one-third of a phone screen
-       on a single line. --- */
+    /* --- Phone footer links: two wrappers, 3 over 3, columns lined up
+       (2026-10-16, Bill's call — replaces the 2026-10-14 grid on these
+       rows). Phone only — desktop/tablet keep the single flex row via
+       display: contents on .footer-link-wrapper above. Each row of links
+       is its own wrapper; inside a wrapper every link takes a fixed one
+       third, and both wrappers share the footer's full width and the
+       same 6px gap, so the columns line up. Covers the
+       FIRST row of #disclaimer-footer (HOW TO PLAY/STORY/BUY TICKET over
+       FEEDBACK/TERMS/LICENSE) and the post-race bar's row (PLAY AGAIN/
+       HOW TO PLAY/STORY over BUY TICKET/FEEDBACK/SHARE). Link size is
+       12px on phone, measured to fit HOW TO PLAY in one third. --- */
     @media (max-width: 767px) {
-      #disclaimer-footer .footer-row:first-child {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 8px 6px;
-        justify-items: center;
-        align-items: center;
-      }
-      #disclaimer-footer .footer-row:first-child a {
-        font-size: 13px;
-        padding: 3px 6px;
-        white-space: nowrap;
-      }
-      /* Post-race bar: same phone treatment (2026-10-15, Bill's call).
-         Its row is PLAY AGAIN | STORY | BUY TICKET | FEEDBACK | SHARE —
-         3 over 2 in the same equal columns, FEEDBACK under PLAY AGAIN
-         and SHARE under STORY. Desktop keeps the single flex row. */
+      #disclaimer-footer .footer-row:first-child,
       #sticky-bottom-bar .footer-row {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 8px 6px;
-        justify-items: center;
-        align-items: center;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        gap: 6px;
+        width: 100%;
+        align-items: stretch;
       }
+      #disclaimer-footer .footer-link-wrapper,
+      #sticky-bottom-bar .footer-link-wrapper {
+        display: flex;
+        gap: 6px;
+        width: 100%;
+      }
+      #disclaimer-footer .footer-link-wrapper > a,
+      #disclaimer-footer .footer-link-wrapper > .buy-ticket-wrap,
+      #sticky-bottom-bar .footer-link-wrapper > a,
+      #sticky-bottom-bar .footer-link-wrapper > .buy-ticket-wrap {
+        /* A fixed one-third basis (minus the two 6px gaps), not grow-from-
+           zero: with flex: 1 1 0 the BUY TICKET glow wrap sized itself
+           narrower than its row-mates in Chromium and the columns drifted
+           (measured). A fixed third makes the line-up structural. */
+        flex: 0 0 calc((100% - 12px) / 3);
+        min-width: 0;
+      }
+      #disclaimer-footer .footer-link-wrapper > .buy-ticket-wrap,
+      #sticky-bottom-bar .footer-link-wrapper > .buy-ticket-wrap {
+        display: flex;
+      }
+      #disclaimer-footer .footer-link-wrapper > .buy-ticket-wrap > a,
+      #sticky-bottom-bar .footer-link-wrapper > .buy-ticket-wrap > a {
+        flex: 1 1 0;
+        min-width: 0;
+      }
+      #disclaimer-footer .footer-row:first-child a,
       #sticky-bottom-bar .footer-row a {
-        font-size: 13px;
+        font-size: 12px;
+        letter-spacing: 0.4px;
         padding: 3px 6px;
         white-space: nowrap;
+        text-align: center;
       }
     }
 
