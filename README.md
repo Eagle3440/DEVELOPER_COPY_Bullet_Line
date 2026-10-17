@@ -33,7 +33,7 @@
  AUTO STALL is emergency-only and Brake-only: it fires automatically only when Train X is one step from the station and about to take it. AUTO ADVANCE is emergency-only and Express-only: it fires automatically only when Train X is one step from the station and about to take it while you are one step away -- the Express surges to the station, turning defeat into a sudden-death tiebreak. The player is told what happened via an on-screen banner in both cases.
 4. **Mystery Ticket Bonus:** each Ticket Store pack purchased secretly banks one random Shekel bonus (1st ticket: 1-20,000, 2nd: 1-30,000, 3rd: 1-40,000, +10k per ticket -- one amount per ticket). Nothing is revealed at purchase. At race start each bonus arms a secret trigger (a random correct-answer number, 1-8); answering that race question correctly fires a gold " TICKET BONUS!" banner (stays 8 seconds) adding the Shekels to the race bank -- win the race to keep it, and the win summary itemizes the bonus so you can see what you got. Unfired bonuses stay armed for future races.
 5. **The Race:** Answer questions to advance your Bullet Line to the station (Step 0) before Train X gets there. Train X runs at the accuracy of the opponent you picked (Disciple 68%, Scholar 76%, Prophet 84%, adjusted slightly by question difficulty each round). Watch for ** hazard events** -- at most one per race, never before round 4 and never in sudden death: a hazard card appears with a thunder-rumble warning, and the race question becomes your dodge test. Answer correctly to dodge it (green DODGED flash); miss and the hazard knocks you back one step (red HIT flash). Win the race to bank your Builder total multiplied by your opponent's win bonus (x1 / x1.25 / x1.5). If both trains cross together, a sudden-death question decides it!
-6. **End of Race:** When the race ends, the steps collapse one by one (7->1, then the NARROW WAY GATE STATION bar -- 8 clacks total), then a cinematic plays: `win.mp4` on victory, `lose.mp4` on defeat (a placeholder panel with 3-second auto-continue appears if the video file is missing). After the video, the Game Summary Report slides up over the emptied board.
+6. **End of Race:** When the race ends, the steps collapse one by one (7->1, then the NARROW GATE STATION bar -- 8 clacks total), then a cinematic plays: `win.mp4` on victory, `lose.mp4` on defeat (a placeholder panel with 3-second auto-continue appears if the video file is missing). After the video, the Game Summary Report slides up over the emptied board.
 
 If you've bought one or more question packs from the Ticket Store (see below), the title screen also offers a **category-only play** option, drawing questions solely from that pack's books of the Bible instead of the full mixed deck.
 
@@ -58,11 +58,10 @@ They're shuffled once per session: the intro always plays first (the opening sce
 
 * The videos fill the title picture exactly, playing above it but below the treasury HUD, so your Shekels stay visible.
 * Video sound follows the sound switch -- the clips stay muted until you turn sound on.
-* Before each automatic video (except the first page-load intro), a **3-2-1 countdown** appears in a small circle in the bottom-left corner of the picture -- desktop only, since the phone's bottom-left corner holds the TREASURY marker.
-* **Ticker launch warning:** every video launch is announced on the news ticker -- line 1 clears and an amber warning appears, fading in and pulsing like a warning beacon until the video ends, naming where the bullet train is headed: `⚠ WARNING: BULLET LINE DEPARTING FOR THE SEA OF GALILEE ⚠` on desktop, or just the shortened destination like `SEA OF GALILEE` on phone. A single two-tone warning alarm sounds once when the warning appears (it follows the sound switch), and the weather music cuts out for the duration of the video, returning on its own afterward. When the video ends, the warning fades out and line 1 goes back to its normal welcome messages. The full launch sequence is: departure timer (to the top of the minute) → warning + music cut → 3 seconds → 3-2-1 countdown → video.
+* **Ticker launch warning:** every video launch is announced on the news ticker -- line 1 clears and an amber warning appears, fading in and pulsing like a warning beacon until the video ends, naming where the bullet train is headed: `⚠ WARNING: BULLET LINE DEPARTING FOR THE SEA OF GALILEE ⚠` on desktop, or just the shortened destination like `SEA OF GALILEE` on phone. A single two-tone warning alarm sounds once when the warning appears (it follows the sound switch), and the weather music cuts out for the duration of the video, returning on its own afterward. When the video ends, the warning fades out and line 1 goes back to its normal welcome messages. The full launch sequence is: departure timer (to the top of the minute) → warning + music cut → 3 seconds → video.
 * The **↻ replay button** (bottom-right of the picture on desktop, top-right on phone) replays the intro at any time, which also restarts the shuffled sequence from the beginning.
 * **Background tabs go quiet:** if the tab is hidden (another tab, minimized window, or the browser closed but still running in the background), the game freezes its title-screen ambience -- the departures board, the shuffled video sequence, the tickers -- and silences all audio. Everything resumes exactly where it froze when you come back. Gameplay itself is untouched.
-* Starting a game stops the video sequence; returning to the title screen restarts the departure countdown.
+* Starting a game stops the video sequence; returning to the title screen restarts the three-minute countdown.
 * Deployment note: all ten `.mp4` files must sit in the same folder as `index.html`. If one is missing, the sequence skips it and moves on to the next.
 
 ---
@@ -81,7 +80,7 @@ The game tracks your biblical wealth across three distinct metrics:
 
 ### **TOTAL TREASURY** (Running Tally)
 * **What it is:** The cumulative total of all Shekels earned across every won game, ever.
-* **When it updates:** Only increases when you **win** a game (reach Narrow Way Gate Station). Your Builder total is multiplied by your chosen opponent's win bonus -- x1 (Disciple), x1.25 (Scholar), or x1.5 (Prophet) -- before it's banked. Losses don't add to this total. It also **decreases** when you spend it on a question pack in the Ticket Store.
+* **When it updates:** Only increases when you **win** a game (reach Narrow Gate Station). Your Builder total is multiplied by your chosen opponent's win bonus -- x1 (Disciple), x1.25 (Scholar), or x1.5 (Prophet) -- before it's banked. Losses don't add to this total. It also **decreases** when you spend it on a question pack in the Ticket Store.
 * **When it resets:** Never resets automatically -- it's a persistent running tally saved in browser localStorage under the key `totalTreasuryAccount`, and it carries forward across page reloads and browser sessions (and is shared with the Ticket Store -- see below). You can manually clear it only by clearing your browser's localStorage.
 * **Display:** Shows at the top-right of the screen during gameplay.
 * **Purpose:** Tracks your all-time success across every game you've ever played on this device/browser, and doubles as your spending balance in the Ticket Store.
@@ -139,7 +138,7 @@ Page reload/new browser session:
 * **BUY TICKET prompt:** A glowing "BUY TICKET" link appears once your Total Treasury is enough to afford the next-cheapest pack you don't yet own, nudging you toward the store. It stops glowing once dismissed, and won't reappear until your treasury grows further.
 * **The ARRIVALS/DEPARTURES board explains itself:** The split-flap board on the title screen lists a "train line" for each of the five packs. A line shows a normal running status (ON TIME, BOARDING NOW, or a DELAY) if you own that pack, or **LOCKED** if you don't. A caption under the board header explains what LOCKED means, and clicking a LOCKED row takes you straight to the Ticket Store to buy it.
 * **The Bullet Line's own row:** Pinned at the top of the board on **Track 0**, the BULLET LINE row is the only row whose times are real -- its TIME and countdown are read straight from the station clock's departure schedule (the same schedule that launches the title videos), so the board, the news ticker's NEXT DEPARTURE countdown, and the clock can never disagree. Her statuses run STANDBY / IN n MIN / DEPARTING / EN ROUTE -- she is never delayed.
-* **The station clock:** A Solari-style flip clock tells the real time under a maker's plate that reads **CURRENT TIME**. On desktop it docks at the bottom-left of the title picture; on phone it rides in the board header. The clock belongs to the title screen only -- it leaves when a game starts and returns when you do. It is also the game's one time source: the board re-flips at the exact instant the clock's minute card turns.
+* **The station clock:** A Solari-style flip clock tells the real time under a maker's plate that reads **CURRENT TIME**. On desktop it docks at the bottom-left of the title picture; on phone, a plain time readout rides in the board header instead -- fed by the same clock, so the time agrees everywhere. The clock belongs to the title screen only -- it leaves when a game starts and returns when you do. It is also the game's one time source: the board re-flips at the exact instant the clock's minute card turns.
 * **Note:** Spending Shekels in the store permanently reduces your Total Treasury balance -- there's no separate in-store currency.
 
 ---
@@ -223,13 +222,13 @@ The title screen features a two-line scrolling LED ticker themed as a fictional 
 
 ---
 
-## <img src="narrow-gate-emblem.png" width="32" alt=""> Narrow Way Gate Station — The Sign
+## <img src="narrow-gate-emblem.png" width="32" alt=""> Narrow Gate Station — The Sign
 
 Every line on the board — and every race — runs to one station, and the station has a name:
 
 > *"Because strait is the gate, and narrow is the way, which leadeth unto life, and few there be that find it."* — Matthew 7:14 (KJV)
 
-**NARROW WAY GATE STATION.** The name rides the race board's Step 0 bar, where both trains finish — and on the title screen it hangs as a **station sign** in the departures board header: deep emerald-green enamel with cream letters and a cream border, in the style of the great old railway signs, with a maker's line underneath — **EST. MATTHEW 7:14**.
+**NARROW GATE STATION.** The name rides the race board's Step 0 bar, where both trains finish — and on the title screen it hangs as a **station sign** in the departures board header: deep emerald-green enamel with cream letters and a cream border, in the style of the great old railway signs, with a maker's line underneath — **EST. MATTHEW 7:14**.
 
 <img src="narrow-gate.jpg" width="210" alt="The Narrow Gate — an ancient stone gate, its wooden doors opened a crack, golden light streaming through the narrow opening onto the path">
 
