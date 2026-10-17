@@ -2098,26 +2098,45 @@
       gap: 12px;
     }
 
-    /* Station name plate (2026-10-16): the station's sign in the board
-       header's right side on desktop; on phone it wraps to a centered line
-       under the header row (the clock keeps the phone corner). Start page
-       only. The sign is Bill's own artwork (station-sign.jpg — he re-laid
-       it in Meta to the slot's 2520x368 shape), so the plate is only its
-       holder now: the picture carries the green enamel, the cream
-       lettering and the rusted border — and per Bill's call the border
-       stays ON in every ticket state; the old owned-state border removal
-       is retired. 46 tall on desktop, 35 on phone. */
+    /* Station name plate (2026-10-16, Bill's pick — Option B, green
+       enamel; restored 2026-10-17 at Bill's call): the ORIGINAL
+       code-drawn sign is back in the board header — NARROW GATE STATION
+       with EST. MATTHEW 7:14 under it. The picture sign
+       (station-sign.jpg) is out; the game no longer loads it. Sign only:
+       the station's name stays NARROW WAY GATE STATION everywhere else
+       (race finish bar, story, readmes). The border stays ON in every
+       ticket state (Bill's call, 2026-10-16 — the old owned-state
+       border removal stays retired). Lettering is the original 15px
+       design eased to 14.5px / 3.2px tracking so the whole plate
+       measures inside the 315px slot the picture sign occupied; the
+       look is unchanged. Desktop only — no sign on phones (Bill,
+       2026-10-17). */
     .station-plate {
       display: flex;
       align-items: center;
-      line-height: 0;
+      gap: 10px;
+      white-space: nowrap;
+      background: linear-gradient(180deg, #0e4d36, #083324);
+      border: 2px solid #e9e2c8;
+      border-radius: 6px;
+      padding: 6px 18px 7px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6), inset 0 0 0 3px #083324, inset 0 0 0 4px rgba(233, 226, 200, 0.5);
+      color: #f2ecd8;
+      font-family: Arial, Helvetica, sans-serif;
+      font-weight: 700;
+      font-size: 14.5px;
+      letter-spacing: 3.2px;
     }
-    .station-plate img {
-      display: block;
-      height: 46px;
-      width: auto;
-      border-radius: 5px;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+    .station-plate svg { width: 21px; height: 18px; flex: none; }
+    .station-plate-text { display: flex; flex-direction: column; align-items: center; }
+    .station-plate-sub {
+      font-size: 7.5px;
+      font-weight: 400;
+      letter-spacing: 4px;
+      padding-left: 4px;
+      color: #d9d2b8;
+      margin-top: 3px;
+      white-space: nowrap;
     }
 
     /* Solari flip clock (2026-10-16, Bill's pick — style #3): cream flap
