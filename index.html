@@ -4050,7 +4050,11 @@
           else if (pub.mode === "enroute") { statusLabel = "EN ROUTE"; }
           else {
             const mins = pub.departAt ? Math.max(1, Math.ceil((pub.departAt - Date.now()) / 60000)) : null;
-            statusLabel = mins ? "IN " + mins + " MIN" : "ON TIME";
+            // Boarding (Bill, 2026-10-17): passengers get the last two
+            // board-minutes to get on -- BOARDING NOW in the blue replaces
+            // IN 2 MIN / IN 1 MIN on the Bullet Line's row.
+            if (mins && mins <= 2) { statusLabel = "BOARDING NOW"; statusColor = "#33b5ff"; }
+            else statusLabel = mins ? "IN " + mins + " MIN" : "ON TIME";
           }
         }
         return {
