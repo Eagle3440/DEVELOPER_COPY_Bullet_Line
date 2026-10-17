@@ -21,47 +21,18 @@
       position: relative;
     }
 
-    #fog-canvas {
+    /* The station picture (Bill, 2026-10-16): Narrow Way Gate Station at
+       night, start page only, in place of the old fog. Dimmed back so the
+       panels stay readable; hidden with the clock when the game starts. */
+    .station-bg {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
+      inset: 0;
+      background: url('station-background.jpg') center / cover no-repeat;
+      filter: brightness(0.55) saturate(0.95);
       pointer-events: none;
       z-index: 0;
     }
 
-    .fog-layer-1, .fog-layer-2 {
-      position: fixed;
-      top: -20%;
-      left: -50%;
-      width: 200%;
-      height: 140%;
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    .fog-layer-1 {
-      background: radial-gradient(circle at 30% 50%, rgba(0, 150, 255, 0.08) 0%, rgba(0, 80, 180, 0.04) 45%, transparent 70%);
-      animation: fogFast 20s linear infinite alternate;
-      filter: blur(40px);
-    }
-
-    .fog-layer-2 {
-      background: radial-gradient(ellipse at 70% 40%, rgba(70, 130, 180, 0.12) 0%, rgba(0, 50, 120, 0.15) 55%, transparent 80%);
-      animation: fogSlow 35s ease-in-out infinite alternate;
-      filter: blur(60px);
-    }
-
-    @keyframes fogFast {
-      0% { transform: translateX(-8%) translateY(-4%) rotate(0deg); }
-      100% { transform: translateX(6%) translateY(5%) rotate(1.5deg); }
-    }
-
-    @keyframes fogSlow {
-      0% { transform: translateX(4%) scale(1); }
-      100% { transform: translateX(-8%) scale(1.15); }
-    }
 
     #disclaimer-footer {
       position: fixed;
@@ -323,7 +294,7 @@
     .title-intro-replay {
       position: absolute;
       bottom: 8px;
-      right: 8px;
+      right: 8px; /* back to the original bottom-right spot on 2026-10-16 (Bill: 'I was wrong, swap back') — the clock took the bottom-left instead */
       z-index: 5;
       width: 34px;
       height: 34px;
@@ -2076,19 +2047,66 @@
       gap: 12px;
     }
 
+    /* Station name plate (2026-10-16): the station's sign in the board
+       header's right side on desktop; on phone it wraps to a centered line
+       under the header row (the clock keeps the phone corner). Start page
+       only. The sign is Bill's own artwork (station-sign.jpg — he re-laid
+       it in Meta to the slot's 2520x368 shape), so the plate is only its
+       holder now: the picture carries the green enamel, the cream
+       lettering and the rusted border — and per Bill's call the border
+       stays ON in every ticket state; the old owned-state border removal
+       is retired. 46 tall on desktop, 35 on phone. */
+    .station-plate {
+      display: flex;
+      align-items: center;
+      line-height: 0;
+    }
+    .station-plate img {
+      display: block;
+      height: 46px;
+      width: auto;
+      border-radius: 5px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+    }
+
     /* Solari flip clock (2026-10-16, Bill's pick — style #3): cream flap
        cards with the maker's split line, dark housing, BULLET LINE plate.
        Sized to the header slot the old text readout occupied; the header
        trims above keep the board's rows ending at the same Y. */
     .flip-clock {
+      position: relative;
       display: flex;
       flex-direction: column;
       align-items: center;
-      background: linear-gradient(180deg, #1b1e24, #0a0c0f);
-      border: 1px solid rgba(255, 255, 255, 0.16);
+      background:
+        radial-gradient(ellipse 80px 22px at 18% 0%, rgba(235, 230, 214, 0.07), rgba(235, 230, 214, 0) 70%),
+        radial-gradient(ellipse 70px 24px at 85% 110%, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0) 70%),
+        linear-gradient(180deg, #17181c, #0a0b0d);
+      border: 1px solid rgba(255, 255, 255, 0.14);
       border-radius: 8px;
       padding: 4px 9px 3px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.09);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.66), inset 0 1px 0 rgba(255, 244, 205, 0.10), inset 0 -8px 14px rgba(0, 0, 0, 0.34);
+    }
+    /* Indoor age (Bill, 2026-10-16 — matched to his Meta picture, v87):
+       the clock hung indoors, so no rust — matte scratched housing, dust,
+       and cards yellowed and scuffed like the photograph. */
+    .flip-clock::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      z-index: 20;
+      pointer-events: none;
+      background-image:
+        linear-gradient(101deg, rgba(255, 255, 255, 0) 31.8%, rgba(235, 232, 220, 0.05) 32%, rgba(255, 255, 255, 0) 32.3%),
+        linear-gradient(97deg, rgba(255, 255, 255, 0) 63.8%, rgba(235, 232, 220, 0.04) 64%, rgba(255, 255, 255, 0) 64.3%),
+        linear-gradient(112deg, rgba(255, 255, 255, 0) 82.8%, rgba(235, 232, 220, 0.045) 83%, rgba(255, 255, 255, 0) 83.3%),
+        radial-gradient(circle 1.2px at 4px 5px, rgba(230, 224, 202, 0.13) 98%, rgba(230, 224, 202, 0)),
+        radial-gradient(circle 1.2px at calc(100% - 5px) calc(100% - 4px), rgba(230, 224, 202, 0.11) 98%, rgba(230, 224, 202, 0)),
+        radial-gradient(circle 1px at 18% 88%, rgba(224, 211, 174, 0.16) 98%, rgba(224, 211, 174, 0)),
+        radial-gradient(circle 1px at 84% 12%, rgba(224, 211, 174, 0.2) 98%, rgba(224, 211, 174, 0)),
+        radial-gradient(ellipse 22px 4px at 52% 4%, rgba(224, 211, 174, 0.05), rgba(224, 211, 174, 0) 70%);
+      background-repeat: no-repeat;
     }
     .flip-clock-cards { display: flex; align-items: center; gap: 4px; }
     .flip-card {
@@ -2101,15 +2119,44 @@
       color: #17181c;
       perspective: 220px;
       border-radius: 4px;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
+      box-shadow: 0 0 0 2px rgba(4, 5, 6, 0.88), 0 2px 5px rgba(0, 0, 0, 0.75), inset 0 0 0 1px rgba(87, 72, 45, 0.20);
     }
+    .flip-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      z-index: 6;
+      pointer-events: none;
+      background-image:
+        radial-gradient(ellipse 13px 5px at 8% 6%, rgba(122, 96, 52, 0.13), rgba(122, 96, 52, 0) 70%),
+        radial-gradient(ellipse 13px 5px at 94% 95%, rgba(122, 96, 52, 0.15), rgba(122, 96, 52, 0) 70%);
+      background-repeat: no-repeat;
+    }
+    /* Each card wears differently — no two faces aged alike (v87). */
+    .flip-card:nth-child(1)::before { background-image:
+        radial-gradient(circle 0.9px at 78% 20%, rgba(62, 60, 50, 0.13) 98%, rgba(62, 60, 50, 0)),
+        radial-gradient(circle 0.9px at 22% 82%, rgba(62, 60, 50, 0.11) 98%, rgba(62, 60, 50, 0)),
+        radial-gradient(ellipse 13px 5px at 94% 95%, rgba(122, 96, 52, 0.15), rgba(122, 96, 52, 0) 70%); background-repeat: no-repeat; }
+    .flip-card:nth-child(2)::before { background-image:
+        radial-gradient(circle 0.9px at 16% 40%, rgba(62, 60, 50, 0.12) 98%, rgba(62, 60, 50, 0)),
+        radial-gradient(circle 0.9px at 84% 62%, rgba(62, 60, 50, 0.10) 98%, rgba(62, 60, 50, 0)),
+        radial-gradient(ellipse 13px 5px at 8% 6%, rgba(122, 96, 52, 0.13), rgba(122, 96, 52, 0) 70%); background-repeat: no-repeat; }
+    .flip-card:nth-child(4)::before { background-image:
+        radial-gradient(circle 0.9px at 44% 12%, rgba(62, 60, 50, 0.11) 98%, rgba(62, 60, 50, 0)),
+        radial-gradient(circle 0.9px at 62% 88%, rgba(62, 60, 50, 0.13) 98%, rgba(62, 60, 50, 0)),
+        radial-gradient(ellipse 13px 5px at 94% 95%, rgba(122, 96, 52, 0.14), rgba(122, 96, 52, 0) 70%); background-repeat: no-repeat; }
+    .flip-card:nth-child(5)::before { background-image:
+        radial-gradient(circle 0.9px at 88% 44%, rgba(62, 60, 50, 0.10) 98%, rgba(62, 60, 50, 0)),
+        radial-gradient(circle 0.9px at 34% 64%, rgba(62, 60, 50, 0.12) 98%, rgba(62, 60, 50, 0)),
+        radial-gradient(ellipse 13px 5px at 8% 6%, rgba(122, 96, 52, 0.12), rgba(122, 96, 52, 0) 70%); background-repeat: no-repeat; }
     .flip-half, .flip-leaf {
       position: absolute;
       left: 0;
       width: 100%;
       height: 50%;
       overflow: hidden;
-      background: linear-gradient(180deg, #f7f2e3, #e8dfc9);
+      background: linear-gradient(180deg, #f3ecd8, #e7dcc0);
     }
     .flip-half span, .flip-leaf span {
       display: block;
@@ -2119,7 +2166,7 @@
       text-align: center;
     }
     .flip-top { top: 0; border-radius: 4px 4px 0 0; }
-    .flip-bottom { bottom: 0; border-radius: 0 0 4px 4px; background: linear-gradient(180deg, #eae0cb, #dcd1b4); }
+    .flip-bottom { bottom: 0; border-radius: 0 0 4px 4px; background: linear-gradient(180deg, #ddd0aa, #e2d5b2 45%, #d6c49c); }
     .flip-bottom span, .flip-leaf-bottom span { transform: translateY(-16.5px); }
     .flip-card::after {
       content: '';
@@ -2134,14 +2181,14 @@
     }
     .flip-leaf { z-index: 4; backface-visibility: hidden; display: none; }
     .flip-leaf-top { top: 0; transform-origin: bottom; border-radius: 4px 4px 0 0; }
-    .flip-leaf-bottom { bottom: 0; transform-origin: top; border-radius: 0 0 4px 4px; background: linear-gradient(180deg, #eae0cb, #dcd1b4); }
+    .flip-leaf-bottom { bottom: 0; transform-origin: top; border-radius: 0 0 4px 4px; background: linear-gradient(180deg, #ddd0aa, #e2d5b2 45%, #d6c49c); }
     .flip-card.flipping .flip-leaf { display: block; }
     .flip-card.flipping .flip-leaf-top { animation: flipLeafTop 0.26s ease-in forwards; }
     .flip-card.flipping .flip-leaf-bottom { animation: flipLeafBottom 0.26s ease-out 0.26s both; }
     @keyframes flipLeafTop { from { transform: rotateX(0deg); } to { transform: rotateX(-90deg); } }
     @keyframes flipLeafBottom { from { transform: rotateX(90deg); } to { transform: rotateX(0deg); } }
     .flip-colon {
-      color: #eae0cb;
+      color: #ddd5bf;
       font-family: Arial, Helvetica, sans-serif;
       font-weight: 700;
       font-size: 23px;
@@ -2154,10 +2201,45 @@
       font-size: 7px;
       letter-spacing: 3px;
       padding-left: 3px;
-      color: #b8ae95;
+      color: #cfc7ab;
       text-transform: uppercase;
       line-height: 1;
       white-space: nowrap;
+    }
+
+    /* Station clock dock (2026-10-16, Bill's swap, then swapped back the
+       same day): on desktop the clock leaves the board header and docks in
+       the title frame's bottom-LEFT corner at a middle size — smaller
+       than the first dock build (91px housing), bigger than the old
+       header clock (49px). The script moves the one clock element here
+       at >=768px and back to the board header on phone, where everything
+       stays exactly as it was. */
+    .clock-dock {
+      position: absolute;
+      left: 12px;
+      bottom: 12px;
+      z-index: 6;
+    }
+    .clock-dock .flip-clock { padding: 5px 9px 4px; border-radius: 8px; }
+    .clock-dock .flip-clock-cards { gap: 4px; }
+    .clock-dock .flip-card { width: 32px; height: 39px; font-size: 30px; border-radius: 5px; } /* one step smaller, Bill's call 2026-10-16: ~60px housing, 30px digits */
+    .clock-dock .flip-half span, .clock-dock .flip-leaf span { height: 39px; line-height: 39px; }
+    .clock-dock .flip-bottom span, .clock-dock .flip-leaf-bottom span { transform: translateY(-19.5px); }
+    .clock-dock .flip-colon { font-size: 28px; }
+    .clock-dock .flip-plate { font-size: 8px; letter-spacing: 3px; padding-left: 3px; margin-top: 3px; }
+    @media (min-width: 768px) {
+      /* The board header keeps the height the clock used to fill, so the
+         panel bottom lands exactly where it did before the move. */
+      .ticker-header { min-height: 52px; box-sizing: border-box; }
+      /* Bill's call, 2026-10-16: center the station plate top-to-bottom
+         in its header band on desktop (the band as framed by the board's
+         top edge and the header divider; measured center = -12px). The
+         earlier -4px nudge was too small for his eye to register. */
+      .station-plate { transform: translateY(-12px); }
+      /* Any ticket owned: the sign returns to its original spot (Bill,
+         2026-10-16 — the lifted sign gets pushed out of the board top
+         once tickets are bought). The class is set by tickerBuildRows. */
+      .ticker-board.sign-original .station-plate { transform: none; }
     }
 
     .ticker-column-headers {
@@ -2648,7 +2730,9 @@
   .ticker-board { padding: 12px; }
   /* Start-screen fit fix is DESKTOP-ONLY (Bill's call, 2026-10-13): restore
      the pre-fix spacing on phones so the phone layout stays untouched. */
-  .ticker-header { padding-bottom: 3px; margin-bottom: 3px; } /* tightened 2026-10-16 for the flip clock fit */
+  .ticker-header { padding-bottom: 3px; margin-bottom: 3px; flex-wrap: wrap; } /* tightened 2026-10-16 for the flip clock fit; wrap lets the station plate take its own centered line under the phone header */
+  .station-plate { order: 3; margin: 5px auto 1px; }
+  .station-plate img { height: 35px; }
   .card-container { padding-bottom: 24px; }
   .ticker-title { font-size: 13px; letter-spacing: 1px; }
   .flip-clock { padding: 4px 6px 3px; border-radius: 6px; }
@@ -2805,6 +2889,8 @@
   .title-intro-replay {
     top: 8px;
     bottom: auto;
+    left: auto; /* phone keeps its top-right spot exactly (Bill: phone unchanged) */
+    right: 8px;
   }
 
   /* --- Learning Library header (2026-10-10): the 900-weight title ran
