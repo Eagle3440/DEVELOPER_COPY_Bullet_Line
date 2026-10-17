@@ -21,7 +21,7 @@
       position: relative;
     }
 
-    /* The station picture (Bill, 2026-10-16): Narrow Way Gate Station at
+    /* The station picture (Bill, 2026-10-16): Narrow Gate Station at
        night, start page only, in place of the old fog. Dimmed back so the
        panels stay readable; hidden with the clock when the game starts. */
     .station-bg {
@@ -2102,9 +2102,10 @@
        enamel; restored 2026-10-17 at Bill's call): the ORIGINAL
        code-drawn sign is back in the board header — NARROW GATE STATION
        with EST. MATTHEW 7:14 under it. The picture sign
-       (station-sign.jpg) is out; the game no longer loads it. Sign only:
-       the station's name stays NARROW WAY GATE STATION everywhere else
-       (race finish bar, story, readmes). The border stays ON in every
+       (station-sign.jpg) is out; the game no longer loads it. The
+       station's name is NARROW GATE STATION everywhere again (renamed
+       back later on 2026-10-17 — race finish bar, story, and readmes
+       all match the sign). The border stays ON in every
        ticket state (Bill's call, 2026-10-16 — the old owned-state
        border removal stays retired). Lettering is the original 15px
        design eased to 14.5px / 3.2px tracking so the whole plate

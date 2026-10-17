@@ -31,7 +31,7 @@
   <meta property="og:url" content="https://eagle3440.github.io/scripture-pursuit/" />
   <meta property="og:type" content="website" />
 
-  <link rel="stylesheet" href="styles.css?v=94">
+  <link rel="stylesheet" href="styles.css?v=95">
   <script src="https://cdn.jsdelivr.net/npm/gameanalytics@4.0.0/umd/gameanalytics.min.js"></script>
 </head>
 <body>
@@ -195,7 +195,7 @@
             <div class="step track-trainx" id="step-d1"><span><span class="step-num">1</span></span><div class="token-space" id="slot-d1"></div></div>
             <div class="step track-bullet" id="step-b1"><span><span class="step-num">1</span></span><div class="token-space" id="slot-b1"></div></div>
           </div>
-          <div class="step" data-step="0" id="step-0"><span>NARROW WAY GATE STATION</span><div class="token-space" id="slot-0"></div></div>
+          <div class="step" data-step="0" id="step-0"><span>NARROW GATE STATION</span><div class="token-space" id="slot-0"></div></div>
           <div id="end-video-stage" class="end-video-stage hidden">
             <video id="end-video" class="end-video" playsinline preload="auto"></video>
             <div id="end-video-placeholder" class="end-video-placeholder hidden">
@@ -985,7 +985,7 @@
       // blocked by the browser's autoplay policy.
       const newsIntro = document.getElementById('news-intro-audio');
       if (newsIntro) {
-        newsIntro.volume = 0.5; // news sting at half volume (Bill, 2026-10-16)
+        newsIntro.volume = 0.25; // news sting at quarter volume (Bill, 2026-10-17)
         const introPromise = newsIntro.play();
         if (introPromise && typeof introPromise.then === 'function') {
           introPromise.then(() => {
@@ -1044,7 +1044,7 @@
       const newsIntro = document.getElementById('news-intro-audio');
       if (!newsIntro) return;
       try {
-        newsIntro.volume = 0.5; // news sting at half volume (Bill, 2026-10-16)
+        newsIntro.volume = 0.25; // news sting at quarter volume (Bill, 2026-10-17)
         newsIntro.currentTime = 0;
         const p = newsIntro.play();
         if (p && typeof p.catch === 'function') p.catch(() => {});
