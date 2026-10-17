@@ -2138,6 +2138,27 @@
       margin-top: 3px;
       white-space: nowrap;
     }
+    /* Any ticket owned (1-5): the sign SHRINKS (Bill, 2026-10-17 — his
+       fix for the owned-state overlap: instead of moving the sign or
+       stripping its border, a smaller sign overlaps nothing). The
+       .sign-original class is set by tickerBuildRows whenever
+       tickerOwnedPacks().length > 0. Smaller lettering, tighter
+       padding, smaller emblem — a genuinely smaller plate, border and
+       all. The desktop position rule below (transform: none in the
+       owned state) still applies on top of this. */
+    .ticker-board.sign-original .station-plate {
+      font-size: 12px;
+      letter-spacing: 2.6px;
+      padding: 5px 14px 6px;
+      gap: 8px;
+    }
+    .ticker-board.sign-original .station-plate svg { width: 17px; height: 15px; }
+    .ticker-board.sign-original .station-plate-sub {
+      font-size: 6.5px;
+      letter-spacing: 3.4px;
+      padding-left: 3.4px;
+      margin-top: 2px;
+    }
 
     /* Solari flip clock (2026-10-16, Bill's pick — style #3): cream flap
        cards with the maker's split line, dark housing, BULLET LINE plate.
