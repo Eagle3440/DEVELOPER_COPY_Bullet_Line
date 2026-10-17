@@ -31,7 +31,7 @@
   <meta property="og:url" content="https://eagle3440.github.io/scripture-pursuit/" />
   <meta property="og:type" content="website" />
 
-  <link rel="stylesheet" href="styles.css?v=88">
+  <link rel="stylesheet" href="styles.css?v=92">
   <script src="https://cdn.jsdelivr.net/npm/gameanalytics@4.0.0/umd/gameanalytics.min.js"></script>
 </head>
 <body>
@@ -311,6 +311,7 @@
               <div class="ticker-header">
                 <span class="ticker-title">ARRIVALS / DEPARTURES</span>
                 <div class="ticker-controls">
+                  <span id="phone-clock" class="phone-clock" aria-hidden="true">--:--</span>
                   <div id="ticker-clock" class="flip-clock" aria-label="Station clock"></div>
                 </div>
                 <div class="station-plate" aria-label="Narrow Way Gate Station">
@@ -612,23 +613,59 @@
     function isPhoneWidth() {
       return window.matchMedia('(max-width: 767px)').matches;
     }
+    // The departure sequence, fired by whichever reaches it first — the
+    // timer below or the station clock's watchdog tick (see
+    // hookDepartureWatchdog). The printed departure time is the moment the
+    // train LEAVES (the video starts), and the warning leads INTO it: the
+    // sequence starts TITLE_WARNING_LEAD_MS before the printed time.
+    function fireTitleDeparture() {
+      const t = titleIntroTimer;
+      titleIntroTimer = null;
+      titleIntroScheduledAt = null;
+      if (t) clearTimeout(t);
+      // Backstop: a game start clears the timer via hideTitleIntro, so this
+      // should only fire on the title screen — but never replay mid-game.
+      if (!document.getElementById('start-game-btn').classList.contains('hidden')) {
+        playTitlePlaylistIndex((titlePlaylistIdx + 1) % TITLE_PLAYLIST.length, true);
+      }
+    }
     function scheduleTitleIntroReplay(delayMs) {
       clearTitleIntroTimer();
+      hookDepartureWatchdog();
       // Optional delay (used by the background-tab resume to re-arm the timer
       // with the time that was left when the tab hid). titleIntroScheduledAt
       // is back-dated so the ticker's NEXT DEPARTURE countdown stays exact.
       const ms = (typeof delayMs === 'number' && delayMs >= 0) ? delayMs : TITLE_INTRO_REPLAY_MS;
-      titleIntroTimer = setTimeout(() => {
-        titleIntroTimer = null;
-        titleIntroScheduledAt = null;
-        // Backstop: a game start clears the timer via hideTitleIntro, so this
-        // should only fire on the title screen — but never replay mid-game.
-        if (!document.getElementById('start-game-btn').classList.contains('hidden')) {
-          playTitlePlaylistIndex((titlePlaylistIdx + 1) % TITLE_PLAYLIST.length, true);
-        }
-      }, ms);
+      titleIntroTimer = setTimeout(fireTitleDeparture, Math.max(0, ms - TITLE_WARNING_LEAD_MS));
       titleIntroScheduledAt = Date.now() - (TITLE_INTRO_REPLAY_MS - ms);
       publishBulletlineDeparture();
+    }
+    // The station-clock watchdog (Bill, 2026-10-17 — the late-departure fix):
+    // browsers put long setTimeout chains to sleep (Brave, battery saving,
+    // a window not in front), and a slept chain fires whenever it wakes —
+    // the board said 03:39 and the train left half a minute later. The
+    // departures now ride the station clock, the same once-a-second source
+    // the clock and the board read: every tick checks the absolute
+    // deadlines, so a delayed timer can no longer desync the launch — the
+    // first tick on or after a deadline fires it, and the printed time is
+    // the departure itself. Whichever path fires first stands the other
+    // down by clearing the shared timer state.
+    let departureWatchdogHooked = false;
+    function hookDepartureWatchdog() {
+      if (departureWatchdogHooked) return;
+      const sc = window.stationClock;
+      if (!sc || typeof sc.onTick !== 'function') return;
+      departureWatchdogHooked = true;
+      sc.onTick((d) => {
+        const now = d.getTime();
+        if (titleIntroTimer && titleIntroScheduledAt != null &&
+            now >= titleIntroScheduledAt + TITLE_INTRO_REPLAY_MS - TITLE_WARNING_LEAD_MS) {
+          fireTitleDeparture();
+        } else if (titleWarningTimer && titleWarningScheduledAt != null &&
+                   now >= titleWarningScheduledAt + TITLE_WARNING_LEAD_MS) {
+          fireTitleLaunch();
+        }
+      });
     }
     function clearTitleFadeTimers() {
       if (titleFadeTimer1) { clearTimeout(titleFadeTimer1); titleFadeTimer1 = null; }
@@ -682,16 +719,20 @@
     }
     // Arms the 3-second launch-warning lead before a title video. Extracted so
     // the background-tab resume can re-arm it with the exact remaining time.
+    function fireTitleLaunch() {
+      const t = titleWarningTimer;
+      titleWarningTimer = null;
+      titleWarningScheduledAt = null;
+      if (t) clearTimeout(t);
+      if (document.getElementById('start-game-btn').classList.contains('hidden')) return;
+      playTitleVideo(TITLE_PLAYLIST[titlePlaylistIdx]);
+    }
     function scheduleTitleWarning(delayMs) {
       clearTitleWarningTimer();
+      hookDepartureWatchdog();
       const ms = (typeof delayMs === 'number' && delayMs >= 0) ? delayMs : TITLE_WARNING_LEAD_MS;
       titleWarningScheduledAt = Date.now() - (TITLE_WARNING_LEAD_MS - ms);
-      titleWarningTimer = setTimeout(() => {
-        titleWarningTimer = null;
-        titleWarningScheduledAt = null;
-        if (document.getElementById('start-game-btn').classList.contains('hidden')) return;
-        playTitleVideo(TITLE_PLAYLIST[titlePlaylistIdx]);
-      }, ms);
+      titleWarningTimer = setTimeout(fireTitleLaunch, ms);
       publishBulletlineDeparture();
     }
     function playTitlePlaylistIndex(i, withCountdown) {
@@ -3638,10 +3679,13 @@
         askedQuestionsLog.forEach((item, index) => {
           const div = document.createElement('div');
           div.className = `summary-item ${item.isCorrect ? 'item-correct' : 'item-wrong'}`;
+          // Phone-only short tag (Bill, 2026-10-17): the full 'Shekel Builder
+          // Round (KJV)' tag hangs over the summary card's edge on phones.
+          const roundTag = (item.round === 'Shekel Builder Round (KJV)' && window.matchMedia('(max-width: 767px)').matches) ? 'Builder Round' : item.round;
           div.innerHTML = `
             <div class="q-header">
               <div class="q-txt">${index + 1}. ${item.q}</div>
-              <div class="q-round-tag">${item.round}</div>
+              <div class="q-round-tag">${roundTag}</div>
             </div>
             <div class="ans-info">
               <div class="ans-row"><span>Result:</span><span class="${item.isCorrect ? 'status-correct' : 'status-wrong'}">${item.isCorrect ? '✓ CORRECT' : '✗ INCORRECT'}</span></div>
@@ -4250,26 +4294,62 @@
       // (Before this, the board ran its own free 60s interval from page
       // load, drifting against the wall clock by the load offset.)
       let tickerBoardPaused = false;
+      // Departure freeze + phone cadence (Bill, 2026-10-17): while a Bullet
+      // Line departure is running (warning lead, launch, video), the board
+      // holds still — no full re-flip lands mid-departure, on ANY device.
+      // The Bullet Line row is always a go: it alone keeps updating, and
+      // one full render resyncs the whole board the moment the departure
+      // clears (the board's update is offset around the departure). On
+      // phones the other lines also drop to a 2-minute cadence: full board
+      // on even minutes, Bullet row only on the in-between minutes.
+      let bulletDepartureLive = false;
+      const tickerPhoneMq = window.matchMedia('(max-width: 767px)');
+      function tickerRenderBulletRow() {
+        const bullet = tickerBuildRows().find(r => r.sortMinutes === -1);
+        if (!bullet) return;
+        const target = tickerRowsData[bullet.idx];
+        if (!target || !target.el) return;
+        target.el.classList.remove('ticker-row-clickable');
+        target.el.onclick = null;
+        target.el.title = '';
+        let colOffset = 0;
+        TICKER_FIELDS.forEach(f => {
+          const str = bullet[f.key];
+          const color = f.color || bullet.statusColor;
+          for (let i = 0; i < f.len; i++) {
+            tickerFlipCell(target[f.key][i], str[i], colOffset * 7, color);
+            colOffset++;
+          }
+        });
+      }
       stationClock.onTick(d => {
         if (tickerBoardPaused) return;
-        if (d.getSeconds() === 0) tickerBoardIntervalTick();
+        if (d.getSeconds() !== 0) return;
+        if (bulletDepartureLive) { tickerRenderBulletRow(); return; }
+        if (tickerPhoneMq.matches && d.getMinutes() % 2 === 1) { tickerRenderBulletRow(); return; }
+        tickerBoardIntervalTick();
       });
-      // Departure events: the board answers a Bullet Line departure with a
-      // full re-flip, in the same moment the LED lines react, and re-flips
-      // again when the lines are handed back after the video.
-      stationClock.on('departure-warning', () => { if (!tickerBoardPaused) tickerRender(); });
-      stationClock.on('departure-clear', () => { if (!tickerBoardPaused) tickerRender(); });
+      // Departure events: during a departure only the Bullet Line row
+      // answers; when the lines are handed back after the video, one full
+      // re-flip resyncs the board.
+      stationClock.on('departure-warning', () => { bulletDepartureLive = true; if (!tickerBoardPaused) tickerRenderBulletRow(); });
+      stationClock.on('departure-clear', () => { bulletDepartureLive = false; if (!tickerBoardPaused) tickerRender(); });
       // The Bullet Line row's data changes when the scheduler publishes a
       // new departure (arm / warning / play / restore) — re-render then, or
       // the row would only pick the change up at the next minute tick and
       // the 3-second DEPARTING state would never be seen (2026-10-16 fix,
-      // caught in verification).
-      stationClock.on('departure-changed', () => { if (!tickerBoardPaused) tickerRender(); });
+      // caught in verification). Mid-departure publishes move the Bullet
+      // row only; the rest of the board waits for the clear.
+      stationClock.on('departure-changed', (pub) => {
+        if (pub) bulletDepartureLive = (pub.mode === 'departing' || pub.mode === 'enroute');
+        if (tickerBoardPaused) return;
+        if (bulletDepartureLive) tickerRenderBulletRow(); else tickerRender();
+      });
       // Background-tab hush hooks (see the visibilitychange handler in the
       // main script): pause the minute re-flip while hidden, resume on return.
       window.__tickerBoardPause = function () { tickerBoardPaused = true; };
       window.__tickerBoardResume = function () {
-        if (tickerBoardPaused) { tickerBoardPaused = false; tickerRender(); }
+        if (tickerBoardPaused) { tickerBoardPaused = false; if (bulletDepartureLive) tickerRenderBulletRow(); else tickerRender(); }
       };
       window.__tickerAudioSuspend = function () {
         if (tickerAudioCtx && tickerAudioCtx.state === "running") tickerAudioCtx.suspend();
@@ -4372,9 +4452,16 @@
         flipped = flipCardTo(flipCards[1], hh[1]) || flipped;
         flipped = flipCardTo(flipCards[2], mm[0]) || flipped;
         flipped = flipCardTo(flipCards[3], mm[1]) || flipped;
-        if (flipped) tickerPlayClack();
+        if (flipped && !window.matchMedia('(max-width: 767px)').matches) tickerPlayClack();
       }
       stationClock.onTick(flipClockRender);
+      // The phone's plain time readout (Bill, 2026-10-17): the old clock,
+      // back in its old spot — same station clock source, so it can never
+      // disagree with the board or the desktop flip clock.
+      const phoneClockEl = document.getElementById('phone-clock');
+      if (phoneClockEl) stationClock.onTick((d) => {
+        phoneClockEl.textContent = String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+      });
       stationClock._emit(new Date());
       setInterval(() => stationClock._emit(new Date()), 1000);
     })();

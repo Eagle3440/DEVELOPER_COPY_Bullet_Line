@@ -2124,6 +2124,7 @@
        cards with the maker's split line, dark housing, BULLET LINE plate.
        Sized to the header slot the old text readout occupied; the header
        trims above keep the board's rows ending at the same Y. */
+    .phone-clock { display: none; }
     .flip-clock {
       position: relative;
       display: flex;
@@ -2782,8 +2783,22 @@
   /* Start-screen fit fix is DESKTOP-ONLY (Bill's call, 2026-10-13): restore
      the pre-fix spacing on phones so the phone layout stays untouched. */
   .ticker-header { padding-bottom: 3px; margin-bottom: 3px; flex-wrap: wrap; } /* tightened 2026-10-16 for the flip clock fit; wrap lets the station plate take its own centered line under the phone header */
-  .station-plate { order: 3; margin: 5px auto 1px; }
-  .station-plate img { height: 35px; }
+  /* No station sign on phones (Bill, 2026-10-17): too big, and there's
+     nowhere to put it. Desktop keeps the sign; the phone board header is
+     ARRIVALS / DEPARTURES + the clock only. */
+  .station-plate { display: none; }
+  /* The fancy flip clock is desktop-only (Bill, 2026-10-17): on phones the
+     old plain time is back in its old spot — same look and size as before
+     (cyan Playfair, 12px on phone). */
+  #ticker-clock { display: none; }
+  .phone-clock {
+    display: inline;
+    color: #00d2ff;
+    text-shadow: 0 0 8px rgba(0, 210, 255, 0.7);
+    font-family: 'Playfair Display', serif;
+    font-size: 12px;
+    letter-spacing: 1px;
+  }
   .card-container { padding-bottom: 24px; }
   .ticker-title { font-size: 13px; letter-spacing: 1px; }
   .flip-clock { padding: 4px 6px 3px; border-radius: 6px; }
