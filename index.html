@@ -635,9 +635,24 @@
       // Optional delay (used by the background-tab resume to re-arm the timer
       // with the time that was left when the tab hid). titleIntroScheduledAt
       // is back-dated so the ticker's NEXT DEPARTURE countdown stays exact.
-      const ms = (typeof delayMs === 'number' && delayMs >= 0) ? delayMs : TITLE_INTRO_REPLAY_MS;
+      // A FRESH arm (no delay passed) snaps the departure to the top of its
+      // printed minute (Bill, 2026-10-17): the old arm landed mid-minute —
+      // 2 minutes after the previous video happened to end, at whatever
+      // seconds — while the board prints only HH:MM, so the train left up
+      // to ~59s after its printed minute started and the status read
+      // IN 1 MIN inside that minute. Now the target is the first :00 at
+      // or after the 2-minute mark (the wait runs 2:00–2:59), so the
+      // printed time IS the leave time: warning at :57, video at :00.
+      // The resume path keeps its exact remaining time, as approved.
+      let ms;
+      const armNow = Date.now();
+      if (typeof delayMs === 'number' && delayMs >= 0) {
+        ms = delayMs;
+      } else {
+        ms = Math.ceil((armNow + TITLE_INTRO_REPLAY_MS) / 60000) * 60000 - armNow;
+      }
       titleIntroTimer = setTimeout(fireTitleDeparture, Math.max(0, ms - TITLE_WARNING_LEAD_MS));
-      titleIntroScheduledAt = Date.now() - (TITLE_INTRO_REPLAY_MS - ms);
+      titleIntroScheduledAt = armNow - (TITLE_INTRO_REPLAY_MS - ms);
       publishBulletlineDeparture();
     }
     // The station-clock watchdog (Bill, 2026-10-17 — the late-departure fix):
